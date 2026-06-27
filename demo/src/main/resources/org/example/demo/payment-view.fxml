@@ -5,57 +5,51 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="720"
-            prefWidth="1280"
+<BorderPane prefHeight="720" prefWidth="1280"
             xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.example.demo.MasterDataController">
 
     <left>
-        <VBox spacing="15" prefWidth="320"
+
+        <VBox spacing="15"
+              prefWidth="320"
               style="-fx-background-color:#F4F4F4;">
 
             <padding>
                 <Insets top="25" left="20" right="20"/>
             </padding>
 
-            <Label text="Form Customer">
+            <Label text="Form Payment">
+
                 <font>
                     <Font size="24"/>
                 </font>
+
             </Label>
+
+            <Label text="Payment ID"/>
+            <TextField/>
+
             <Button text="← Back"
                     onAction="#goBack"
                     prefWidth="100"
                     style="-fx-background-color:#808B96;
                -fx-text-fill:white;"/>
 
-            <Label text="Customer ID"/>
-            <TextField promptText="ID Customer"/>
-
-            <Label text="Customer Name"/>
-            <TextField promptText="Input customer name"/>
-
-            <Label text="Email"/>
-            <TextField promptText="example@email.com"/>
-
-            <Label text="Phone Number"/>
-            <TextField promptText="08123456789"/>
+            <Label text="Payment Method"/>
+            <TextField/>
 
             <HBox spacing="10">
 
-                <Button text="ADD" prefWidth="90"
-                        style="-fx-background-color:#2ECC71; -fx-text-fill:white;"/>
-
-                <Button text="UPDATE" prefWidth="90"
-                        style="-fx-background-color:#3498DB; -fx-text-fill:white;"/>
-
-                <Button text="DELETE" prefWidth="90"
-                        style="-fx-background-color:#E74C3C; -fx-text-fill:white;"/>
+                <Button text="ADD"/>
+                <Button text="UPDATE"/>
+                <Button text="DELETE"/>
 
             </HBox>
 
         </VBox>
+
     </left>
 
     <center>
@@ -66,16 +60,18 @@
                 <Insets top="20" left="20" right="20"/>
             </padding>
 
-            <Label text="Customer List">
+            <Label text="Payment List">
+
                 <font>
                     <Font size="26"/>
                 </font>
+
             </Label>
 
             <HBox spacing="10">
 
                 <TextField HBox.hgrow="ALWAYS"
-                           promptText="Search customer"/>
+                           promptText="Search payment"/>
 
                 <Button text="SEARCH"/>
                 <Button text="RESET"/>
@@ -87,9 +83,7 @@
                 <columns>
 
                     <TableColumn text="ID" prefWidth="100"/>
-                    <TableColumn text="Name" prefWidth="200"/>
-                    <TableColumn text="Email" prefWidth="300"/>
-                    <TableColumn text="Phone" prefWidth="200"/>
+                    <TableColumn text="Method" prefWidth="300"/>
 
                 </columns>
 
