@@ -16,57 +16,38 @@ public class HelloController {
     private Parent root;
 
     public void openMaster(ActionEvent event) throws IOException {
+        stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        boolean isCurrentlyMaximized = stage.isMaximized();
 
-        root = FXMLLoader.load(
-                getClass().getResource("master-view.fxml")
-        );
-
-        stage=(Stage)((Node)event.getSource())
-                .getScene()
-                .getWindow();
-
-        scene=new Scene(root);
+        root = FXMLLoader.load(getClass().getResource("master-view.fxml"));
+        scene = new Scene(root);
 
         stage.setScene(scene);
-        stage.setMaximized(true);
+        stage.setMaximized(isCurrentlyMaximized);
         stage.show();
-
     }
 
     public void openTransaksi(ActionEvent event) throws IOException {
+        stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        boolean isCurrentlyMaximized = stage.isMaximized();
 
-        root = FXMLLoader.load(
-                getClass().getResource("transaksi-view.fxml")
-        );
-
-        stage=(Stage)((Node)event.getSource())
-                .getScene()
-                .getWindow();
-
-        scene=new Scene(root);
+        root = FXMLLoader.load(getClass().getResource("transaksi-view.fxml"));
+        scene = new Scene(root);
 
         stage.setScene(scene);
-        stage.setMaximized(true);
+        stage.setMaximized(isCurrentlyMaximized);
         stage.show();
-
     }
 
     public void openReport(ActionEvent event) throws IOException {
+        stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        boolean isCurrentlyMaximized = stage.isMaximized();
 
-        root = FXMLLoader.load(
-                getClass().getResource("report-view.fxml")
-        );
-
-        stage=(Stage)((Node)event.getSource())
-                .getScene()
-                .getWindow();
-
-        scene=new Scene(root);
+        root = FXMLLoader.load(getClass().getResource("report-view.fxml"));
+        scene = new Scene(root);
 
         stage.setScene(scene);
-        stage.setMaximized(true);
+        stage.setMaximized(isCurrentlyMaximized);
         stage.show();
-
     }
-
 }

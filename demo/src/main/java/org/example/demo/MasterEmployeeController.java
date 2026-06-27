@@ -219,22 +219,17 @@ public class MasterEmployeeController {
     }
 
     //BACK
+    @FXML
     public void goBack(ActionEvent event) throws IOException {
+        stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        boolean isCurrentlyMaximized = stage.isMaximized();
 
-        root = FXMLLoader.load(
-                getClass().getResource("master-view.fxml")
-        );
-
-        stage=(Stage)((Node)event.getSource())
-                .getScene()
-                .getWindow();
-
-        scene=new Scene(root);
+        root = FXMLLoader.load(getClass().getResource("master-view.fxml"));
+        scene = new Scene(root);
 
         stage.setScene(scene);
-        stage.setMaximized(true);
+        stage.setMaximized(isCurrentlyMaximized);
         stage.show();
-
     }
 
     //CLEAR FORM

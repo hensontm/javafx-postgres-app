@@ -1,6 +1,7 @@
 package org.example.demo;
 
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -15,22 +16,17 @@ public class TransaksiController {
     private Scene scene;
     private Parent root;
 
+    @FXML
     public void goBack(ActionEvent event) throws IOException {
+        stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        boolean isCurrentlyMaximized = stage.isMaximized();
 
-        root = FXMLLoader.load(
-                getClass().getResource("hello-view.fxml")
-        );
-
-        stage=(Stage)((Node)event.getSource())
-                .getScene()
-                .getWindow();
-
-        scene=new Scene(root);
+        root = FXMLLoader.load(getClass().getResource("hello-view.fxml"));
+        scene = new Scene(root);
 
         stage.setScene(scene);
-        stage.setMaximized(true);
+        stage.setMaximized(isCurrentlyMaximized);
         stage.show();
-
     }
 
 }
