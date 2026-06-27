@@ -3,8 +3,10 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <BorderPane
@@ -13,32 +15,79 @@
         xmlns="http://javafx.com/javafx/21"
         xmlns:fx="http://javafx.com/fxml/1"
         fx:controller="org.example.demo.ReportController">
+    <!-- HEADER -->
 
     <top>
-
-        <HBox>
-
+        <VBox spacing="5">
             <padding>
-                <Insets top="15" left="15"/>
+                <Insets top="25"
+                        left="40"/>
             </padding>
-
-            <Button text="← Back"
-                    onAction="#goBack"/>
-
-        </HBox>
-
+            <Label text="Restaurant Analytics Dashboard">
+                <font>
+                    <Font size="32"/>
+                </font>
+            </Label>
+            <Label text="Business report and transaction insight">
+                <font>
+                    <Font size="15"/>
+                </font>
+            </Label>
+        </VBox>
     </top>
-
+    <left>
+        <VBox spacing="15">
+            <padding>
+                <Insets top="40"
+                        left="30"
+                        right="20"/>
+            </padding>
+            <Button text="📋 Riwayat Transaksi"
+                    prefWidth="220"
+                    onAction="#riwayatTransaksi"/>
+            <Button text="👤 Customer Aktif"
+                    prefWidth="220"
+                    onAction="#transaksiCustomer"/>
+            <Button text="🏢 Pendapatan Cabang"
+                    prefWidth="220"
+                    onAction="#pendapatanCabang"/>
+            <Button text="🍔 Menu Populer"
+                    prefWidth="220"
+                    onAction="#menuPopuler"/>
+            <Button text="⏰ Jam Sibuk"
+                    prefWidth="220"
+                    onAction="#jamSibuk"/>
+            <Button text="← Back"
+                    prefWidth="220"
+                    onAction="#goBack"/>
+        </VBox>
+    </left>
     <center>
-
-        <Label text="HALAMAN REPORT">
-
-            <font>
-                <Font size="30"/>
-            </font>
-
-        </Label>
-
+        <VBox spacing="20"
+              alignment="CENTER">
+            <Label fx:id="judulReport"
+                   text="Select Report">
+                <font>
+                    <Font size="25"/>
+                </font>
+            </Label>
+            <Label text="Result">
+                <font>
+                    <Font size="16"/>
+                </font>
+            </Label>
+            <TableView fx:id="tableReport"
+                       prefWidth="750"
+                       prefHeight="400">
+                <columns>
+                    <TableColumn fx:id="col1"
+                                 text="Information"
+                                 prefWidth="400"/>
+                    <TableColumn fx:id="col2"
+                                 text="Value"
+                                 prefWidth="300"/>
+                </columns>
+            </TableView>
+        </VBox>
     </center>
-
 </BorderPane>
