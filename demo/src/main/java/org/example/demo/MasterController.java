@@ -58,7 +58,45 @@ public class MasterController {
     //Employee
     @FXML
     public void goEmployee(ActionEvent e) throws IOException{
-    root = FXMLLoader.load(getClass().getResource());
+        root = FXMLLoader.load(getClass().getResource("employee-view.fxml"));
+        stage = (Stage) ((Node)e.getSource()).getScene().getWindow();
+        scene = new Scene(root);
+
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    //Branch
+    @FXML
+    public void goBranch(ActionEvent e) throws IOException{
+        root = FXMLLoader.load(getClass().getResource("branch-view.fxml"));
+        stage = (Stage) ((Node)e.getSource()).getScene().getWindow();
+        scene = new Scene(root);
+
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    //Customer
+    @FXML
+    public void goCustomer(ActionEvent e) throws IOException{
+        root = FXMLLoader.load(getClass().getResource("customer-view.fxml"));
+        stage = (Stage) ((Node)e.getSource()).getScene().getWindow();
+        scene = new Scene(root);
+
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    //Menu
+    @FXML
+    public void goMenu(ActionEvent e) throws IOException{
+        root = FXMLLoader.load(getClass().getResource("menu-view.fxml"));
+        stage = (Stage) ((Node)e.getSource()).getScene().getWindow();
+        scene = new Scene(root);
+
+        stage.setScene(scene);
+        stage.show();
     }
 
 }
