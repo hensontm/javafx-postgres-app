@@ -1,16 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
-
 <?import javafx.scene.control.Button?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.example.demo.HelloController">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-    </padding>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-    <Label fx:id="welcomeText"/>
-    <Button text="Hello!" onAction="#onHelloButtonClick"/>
+<VBox alignment="CENTER"
+      spacing="35"
+      prefHeight="720"
+      prefWidth="1280"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.demo.HelloController">
+
+    <Button text="Data Master"
+            prefWidth="450"
+            prefHeight="90"
+            onAction="#openMaster">
+
+        <font>
+            <Font size="28"/>
+        </font>
+
+    </Button>
+
+    <Button text="Data Transaksi"
+            prefWidth="450"
+            prefHeight="90"
+            onAction="#openTransaksi">
+
+        <font>
+            <Font size="28"/>
+        </font>
+
+    </Button>
+
+    <Button text="Report"
+            prefWidth="450"
+            prefHeight="90"
+            onAction="#openReport">
+
+        <font>
+            <Font size="28"/>
+        </font>
+
+    </Button>
+
 </VBox>
