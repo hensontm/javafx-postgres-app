@@ -1,0 +1,274 @@
+package org.example.demo;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
+
+import java.io.IOException;
+import java.sql.*;
+
+public class MasterEmployeeController {
+
+    //ID
+    @FXML private TextField txtidEmployee;
+    @FXML private TextField txtnamaEmployee;
+    @FXML private ComboBox<String> comboPosition;
+    @FXML private TextField txtSalary;
+    @FXML private TextField txtCari;
+
+    @FXML private TableView<Employee> tabelEmployee;
+    @FXML private TableColumn<Employee, Integer> colId;
+    @FXML private TableColumn<Employee, String> colName;
+    @FXML private TableColumn<Employee, String> colPosition;
+    @FXML private TableColumn<Employee, Double> colSalary;
+
+    private Parent root;
+    private Stage stage;
+    private Scene scene;
+
+    //Observable List
+    private final ObservableList<Employee> daftarEmployee = FXCollections.observableArrayList();
+
+    @FXML
+    public void initialize() {
+        //Connect nilai ke kolom table view
+        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colPosition.setCellValueFactory(new PropertyValueFactory<>("position"));
+        colSalary.setCellValueFactory(new PropertyValueFactory<>("salary"));
+
+        tabelEmployee.setItems(daftarEmployee);
+
+        //Isi combobox
+        comboPosition.getItems().addAll("Manager", "Staff", "Supervisor", "Developer");
+
+        //Load data PosgreSQL
+        loadDataDariDatabase();
+
+        //Kalau diklik, formnya keisi
+        tabelEmployee.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                txtidEmployee.setText(String.valueOf(newSelection.getId()));
+                txtidEmployee.setDisable(true); //ID tidak berubah saat UPDATE
+                txtnamaEmployee.setText(newSelection.getName());
+                comboPosition.setValue(newSelection.getPosition());
+                txtSalary.setText(String.valueOf(newSelection.getSalary()));
+            }
+        });
+    }
+
+    //Narik data PosgreSQL
+    private void loadDataDariDatabase() {
+        daftarEmployee.clear();
+        String query = "SELECT id_employee, nama_employee, jabatan_employee, gaji_employee FROM public.employee ORDER BY id_employee ASC";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Employee emp = new Employee(
+                        rs.getInt("id_employee"),
+                        rs.getString("nama_employee"),
+                        rs.getString("jabatan_employee"),
+                        rs.getDouble("gaji_employee")
+                );
+                daftarEmployee.add(emp);
+            }
+        } catch (SQLException e) {
+            showErrorAlert("Database Error", "Gagal memuat data dari database: " + e.getMessage());
+        }
+    }
+
+    //ADD
+    @FXML
+    public void onAddBtnClick() {
+        try {
+            int id = Integer.parseInt(txtidEmployee.getText().trim());
+            String name = txtnamaEmployee.getText().trim();
+            String position = comboPosition.getValue();
+            double salary = Double.parseDouble(txtSalary.getText().trim());
+
+            if (name.isEmpty() || position == null) {
+                showWarningAlert("Input Kosong", "Nama dan Posisi wajib diisi!");
+                return;
+            }
+
+            String query = "INSERT INTO public.employee (id_employee, nama_employee, jabatan_employee, gaji_employee, tanggal_lahir_employee, alamat_employee, id_branch, telp_employee) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+            try (Connection conn = DatabaseConnection.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(query)) {
+
+                stmt.setInt(1, id);
+                stmt.setString(2, name);
+                stmt.setString(3, position);
+                stmt.setDouble(4, salary);
+
+                // Nilai default untuk kolom opsional di pgAdmin agar tidak null constraint error
+                stmt.setDate(5, Date.valueOf("2000-01-01"));
+                stmt.setString(6, "Surabaya");
+                stmt.setInt(7, 1);
+                stmt.setString(8, "0812345678");
+
+                stmt.executeUpdate();
+
+                loadDataDariDatabase();
+                clearForm();
+                showInformationAlert("Sukses", "Data karyawan berhasil ditambahkan!");
+
+            } catch (SQLException e) {
+                showErrorAlert("Database Error", "Gagal menyimpan data: " + e.getMessage());
+            }
+        } catch (NumberFormatException e) {
+            showErrorAlert("Input Salah", "ID dan Salary harus berupa angka valid!");
+        }
+    }
+
+    //UPDATE
+    @FXML
+    public void onUpdateBtnClick() {
+        Employee selected = tabelEmployee.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showWarningAlert("Aksi Ditolak", "Pilih data pada tabel yang ingin diubah!");
+            return;
+        }
+
+        try {
+            String name = txtnamaEmployee.getText().trim();
+            String position = comboPosition.getValue();
+            double salary = Double.parseDouble(txtSalary.getText().trim());
+
+            String query = "UPDATE public.employee SET nama_employee = ?, jabatan_employee = ?, gaji_employee = ? WHERE id_employee = ?";
+
+            try (Connection conn = DatabaseConnection.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(query)) {
+
+                stmt.setString(1, name);
+                stmt.setString(2, position);
+                stmt.setDouble(3, salary);
+                stmt.setInt(4, selected.getId());
+
+                stmt.executeUpdate();
+
+                loadDataDariDatabase();
+                clearForm();
+                showInformationAlert("Sukses", "Data karyawan berhasil diperbarui!");
+
+            } catch (SQLException e) {
+                showErrorAlert("Database Error", "Gagal memperbarui data: " + e.getMessage());
+            }
+        } catch (NumberFormatException e) {
+            showErrorAlert("Input Salah", "Gaji (Salary) harus berupa angka valid!");
+        }
+    }
+
+    //DELETE
+    @FXML
+    public void onDeleteBtnClick() {
+        Employee selected = tabelEmployee.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showWarningAlert("Aksi Ditolak", "Pilih data pada tabel yang ingin dihapus!");
+            return;
+        }
+
+        String query = "DELETE FROM public.employee WHERE id_employee = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, selected.getId());
+            stmt.executeUpdate();
+
+            loadDataDariDatabase();
+            clearForm();
+            showInformationAlert("Sukses", "Data karyawan berhasil dihapus!");
+
+        } catch (SQLException e) {
+            showErrorAlert("Database Error", "Gagal menghapus data: " + e.getMessage());
+        }
+    }
+
+    //SEARCH
+    @FXML
+    public void onSearchBtnClick() {
+        String kataKunci = txtCari.getText().toLowerCase().trim();
+        ObservableList<Employee> hasilFilter = FXCollections.observableArrayList();
+
+        for (Employee emp : daftarEmployee) {
+            if (emp.getName().toLowerCase().contains(kataKunci) ||
+                    emp.getPosition().toLowerCase().contains(kataKunci)) {
+                hasilFilter.add(emp);
+            }
+        }
+        tabelEmployee.setItems(hasilFilter);
+    }
+
+    //RESET
+    @FXML
+    public void onResetBtnClick() {
+        txtCari.clear();
+        tabelEmployee.setItems(daftarEmployee);
+    }
+
+    //BACK
+    public void goBack(ActionEvent event) throws IOException {
+
+        root = FXMLLoader.load(
+                getClass().getResource("master-view.fxml")
+        );
+
+        stage=(Stage)((Node)event.getSource())
+                .getScene()
+                .getWindow();
+
+        scene=new Scene(root);
+
+        stage.setScene(scene);
+        stage.setMaximized(true);
+        stage.show();
+
+    }
+
+    //CLEAR FORM
+    private void clearForm() {
+        txtidEmployee.clear();
+        txtidEmployee.setDisable(false);
+        txtnamaEmployee.clear();
+        comboPosition.setValue(null);
+        txtSalary.clear();
+        tabelEmployee.getSelectionModel().clearSelection();
+    }
+
+    //POP UP ALERT
+    private void showInformationAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    private void showWarningAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    private void showErrorAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+}

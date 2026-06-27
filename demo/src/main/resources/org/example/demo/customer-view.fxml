@@ -1,102 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="720"
-            prefWidth="1280"
-            xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.example.demo.MasterDataController">
+<BorderPane prefHeight="720" prefWidth="1280" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.MasterCustomerController">
 
     <left>
-        <VBox spacing="15" prefWidth="320"
-              style="-fx-background-color:#F4F4F4;">
-
+        <VBox prefWidth="320" spacing="15" style="-fx-background-color:#F4F4F4;">
             <padding>
-                <Insets top="25" left="20" right="20"/>
+                <Insets left="20" right="20" top="25" />
             </padding>
 
             <Label text="Form Customer">
                 <font>
-                    <Font size="24"/>
+                    <Font size="24" />
                 </font>
             </Label>
-            <Button text="← Back"
-                    onAction="#goBack"
-                    prefWidth="100"
-                    style="-fx-background-color:#808B96;
-               -fx-text-fill:white;"/>
+            <Button onAction="#goBack" prefWidth="100" style="-fx-background-color:#808B96; -fx-text-fill:white;" text="← Back" />
 
-            <Label text="Customer ID"/>
-            <TextField promptText="ID Customer"/>
+            <Label text="Customer ID" />
+            <TextField fx:id="txtidCust" promptText="ID Customer" />
 
-            <Label text="Customer Name"/>
-            <TextField promptText="Input customer name"/>
+            <Label text="Customer Name" />
+            <TextField fx:id="txtnamaCust" promptText="Input customer name" />
 
-            <Label text="Email"/>
-            <TextField promptText="example@email.com"/>
+            <Label text="Email" />
+            <TextField fx:id="txtemailCust" promptText="example@email.com" />
 
-            <Label text="Phone Number"/>
-            <TextField promptText="08123456789"/>
+            <Label text="Phone Number" />
+            <TextField fx:id="txttelpCust" promptText="08123456789" />
 
             <HBox spacing="10">
-
-                <Button text="ADD" prefWidth="90"
-                        style="-fx-background-color:#2ECC71; -fx-text-fill:white;"/>
-
-                <Button text="UPDATE" prefWidth="90"
-                        style="-fx-background-color:#3498DB; -fx-text-fill:white;"/>
-
-                <Button text="DELETE" prefWidth="90"
-                        style="-fx-background-color:#E74C3C; -fx-text-fill:white;"/>
-
+                <Button onAction="#onAddBtnClick" prefWidth="90" style="-fx-background-color:#2ECC71; -fx-text-fill:white;" text="ADD" />
+                <Button onAction="#onUpdateBtnClick" prefWidth="90" style="-fx-background-color:#3498DB; -fx-text-fill:white;" text="UPDATE" />
+                <Button onAction="#onDeleteBtnClick" prefWidth="90" style="-fx-background-color:#E74C3C; -fx-text-fill:white;" text="DELETE" />
             </HBox>
-
         </VBox>
     </left>
 
     <center>
-
         <VBox spacing="15">
-
             <padding>
-                <Insets top="20" left="20" right="20"/>
+                <Insets left="20" right="20" top="20" />
             </padding>
 
             <Label text="Customer List">
                 <font>
-                    <Font size="26"/>
+                    <Font size="26" />
                 </font>
             </Label>
 
             <HBox spacing="10">
-
-                <TextField HBox.hgrow="ALWAYS"
-                           promptText="Search customer"/>
-
-                <Button text="SEARCH"/>
-                <Button text="RESET"/>
-
+                <TextField fx:id="txtCari" promptText="Search customer" HBox.hgrow="ALWAYS" />
+                <Button onAction="#onSearchBtnClick" text="SEARCH" />
+                <Button onAction="#onResetBtnClick" text="RESET" />
             </HBox>
 
-            <TableView VBox.vgrow="ALWAYS">
-
+            <TableView fx:id="tabelCustomer" VBox.vgrow="ALWAYS">
                 <columns>
-
-                    <TableColumn text="ID" prefWidth="100"/>
-                    <TableColumn text="Name" prefWidth="200"/>
-                    <TableColumn text="Email" prefWidth="300"/>
-                    <TableColumn text="Phone" prefWidth="200"/>
-
+                    <TableColumn fx:id="colId" prefWidth="100" text="ID" />
+                    <TableColumn fx:id="colName" prefWidth="200" text="Name" />
+                    <TableColumn fx:id="colEmail" prefWidth="300" text="Email" />
+                    <TableColumn fx:id="colPhone" prefWidth="200" text="Phone" />
                 </columns>
-
             </TableView>
-
         </VBox>
-
     </center>
 
 </BorderPane>

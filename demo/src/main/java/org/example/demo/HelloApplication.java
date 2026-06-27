@@ -22,6 +22,7 @@ public class HelloApplication extends Application {
         );
 
         stage.setTitle("Food M-Commerce");
+        stage.setMaximized(true);
         stage.setScene(scene);
         stage.show();
 

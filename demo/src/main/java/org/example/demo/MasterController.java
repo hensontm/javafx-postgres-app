@@ -51,6 +51,7 @@ public class MasterController {
         scene=new Scene(root);
 
         stage.setScene(scene);
+        stage.setMaximized(true);
         stage.show();
 
     }
@@ -63,6 +64,7 @@ public class MasterController {
         scene = new Scene(root);
 
         stage.setScene(scene);
+        stage.setMaximized(true);
         stage.show();
     }
 
@@ -74,6 +76,7 @@ public class MasterController {
         scene = new Scene(root);
 
         stage.setScene(scene);
+        stage.setMaximized(true);
         stage.show();
     }
 
@@ -85,6 +88,7 @@ public class MasterController {
         scene = new Scene(root);
 
         stage.setScene(scene);
+        stage.setMaximized(true);
         stage.show();
     }
 
@@ -96,6 +100,7 @@ public class MasterController {
         scene = new Scene(root);
 
         stage.setScene(scene);
+        stage.setMaximized(true);
         stage.show();
     }
 
@@ -107,6 +112,7 @@ public class MasterController {
         scene = new Scene(root);
 
         stage.setScene(scene);
+        stage.setMaximized(true);
         stage.show();
     }
 
@@ -118,6 +124,7 @@ public class MasterController {
         scene = new Scene(root);
 
         stage.setScene(scene);
+        stage.setMaximized(true);
         stage.show();
     }
 
@@ -129,6 +136,7 @@ public class MasterController {
         scene = new Scene(root);
 
         stage.setScene(scene);
+        stage.setMaximized(true);
         stage.show();
     }
 
@@ -140,6 +148,7 @@ public class MasterController {
         scene = new Scene(root);
 
         stage.setScene(scene);
+        stage.setMaximized(true);
         stage.show();
     }
 

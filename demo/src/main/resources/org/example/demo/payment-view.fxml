@@ -1,96 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="720" prefWidth="1280"
-            xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.example.demo.MasterDataController">
+<BorderPane prefHeight="720" prefWidth="1280" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.MasterPaymentController">
 
     <left>
-
-        <VBox spacing="15"
-              prefWidth="320"
-              style="-fx-background-color:#F4F4F4;">
-
+        <VBox prefWidth="320" spacing="15" style="-fx-background-color:#F4F4F4;">
             <padding>
-                <Insets top="25" left="20" right="20"/>
+                <Insets left="20" right="20" top="25" />
             </padding>
 
             <Label text="Form Payment">
-
                 <font>
-                    <Font size="24"/>
+                    <Font size="24" />
                 </font>
-
             </Label>
 
-            <Label text="Payment ID"/>
-            <TextField/>
+            <Button onAction="#goBack" prefWidth="100" style="-fx-background-color:#808B96; -fx-text-fill:white;" text="← Back" />
 
-            <Button text="← Back"
-                    onAction="#goBack"
-                    prefWidth="100"
-                    style="-fx-background-color:#808B96;
-               -fx-text-fill:white;"/>
+            <Label text="Payment ID" />
+            <TextField fx:id="txtidPayment" promptText="ID Payment" />
 
-            <Label text="Payment Method"/>
-            <TextField/>
+            <Label text="Payment Method" />
+            <TextField fx:id="txtmetodePayment" promptText="Input payment method" />
+
+            <Label text="Discount (%)" />
+            <TextField fx:id="txtdiskonPayment" promptText="Input discount percentage" />
 
             <HBox spacing="10">
-
-                <Button text="ADD"/>
-                <Button text="UPDATE"/>
-                <Button text="DELETE"/>
-
+                <Button onAction="#onAddBtnClick" prefWidth="90" style="-fx-background-color:#2ECC71; -fx-text-fill:white;" text="ADD" />
+                <Button onAction="#onUpdateBtnClick" prefWidth="90" style="-fx-background-color:#3498DB; -fx-text-fill:white;" text="UPDATE" />
+                <Button onAction="#onDeleteBtnClick" prefWidth="90" style="-fx-background-color:#E74C3C; -fx-text-fill:white;" text="DELETE" />
             </HBox>
-
         </VBox>
-
     </left>
 
     <center>
-
         <VBox spacing="15">
-
             <padding>
-                <Insets top="20" left="20" right="20"/>
+                <Insets left="20" right="20" top="20" />
             </padding>
 
             <Label text="Payment List">
-
                 <font>
-                    <Font size="26"/>
+                    <Font size="26" />
                 </font>
-
             </Label>
 
             <HBox spacing="10">
-
-                <TextField HBox.hgrow="ALWAYS"
-                           promptText="Search payment"/>
-
-                <Button text="SEARCH"/>
-                <Button text="RESET"/>
-
+                <TextField fx:id="txtCari" promptText="Search payment" HBox.hgrow="ALWAYS" />
+                <Button onAction="#onSearchBtnClick" text="SEARCH" />
+                <Button onAction="#onResetBtnClick" text="RESET" />
             </HBox>
 
-            <TableView VBox.vgrow="ALWAYS">
-
+            <TableView fx:id="tabelPayment" VBox.vgrow="ALWAYS">
                 <columns>
-
-                    <TableColumn text="ID" prefWidth="100"/>
-                    <TableColumn text="Method" prefWidth="300"/>
-
+                    <TableColumn fx:id="colId" prefWidth="100" text="ID" />
+                    <TableColumn fx:id="colMethod" prefWidth="300" text="Method" />
+                    <TableColumn fx:id="colDiscount" prefWidth="150" text="Discount (%)" />
                 </columns>
-
             </TableView>
-
         </VBox>
-
     </center>
 
 </BorderPane>

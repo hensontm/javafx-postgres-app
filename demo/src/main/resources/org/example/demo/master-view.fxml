@@ -7,16 +7,16 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.MasterController">
    <children>
-      <VBox alignment="CENTER" layoutX="222.0" layoutY="75.0" maxWidth="300.0" prefWidth="300.0" spacing="10.0" AnchorPane.bottomAnchor="55.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="75.0">
+      <VBox alignment="CENTER" layoutX="222.0" layoutY="84.0" spacing="10.0" AnchorPane.bottomAnchor="116.0" AnchorPane.leftAnchor="222.0" AnchorPane.rightAnchor="222.0" AnchorPane.topAnchor="84.0">
          <children>
-            <Button fx:id="btn_employee" maxHeight="1.7976931348623157E308" maxWidth="300.0" mnemonicParsing="false" onAction="#goEmployee" prefHeight="25.0" prefWidth="156.0" text="Employee" />
-            <Button fx:id="btn_branch" maxHeight="1.7976931348623157E308" maxWidth="300.0" mnemonicParsing="false" onAction="#goBranch" prefHeight="25.0" prefWidth="156.0" text="Branch" />
-            <Button fx:id="btn_inventory" maxHeight="1.7976931348623157E308" maxWidth="300.0" mnemonicParsing="false" onAction="#goInventory" prefHeight="25.0" prefWidth="156.0" text="Inventory" />
-            <Button fx:id="btn_customer" maxHeight="1.7976931348623157E308" maxWidth="300.0" mnemonicParsing="false" onAction="#goCustomer" prefHeight="25.0" prefWidth="156.0" text="Customer" />
-            <Button fx:id="btn_payment" maxHeight="1.7976931348623157E308" maxWidth="300.0" mnemonicParsing="false" onAction="#goPayment" prefHeight="25.0" prefWidth="156.0" text="Payment" />
-            <Button fx:id="btn_customization" maxHeight="1.7976931348623157E308" maxWidth="300.0" mnemonicParsing="false" onAction="#goCustomization" prefHeight="25.0" prefWidth="156.0" text="Cuztomization" />
-            <Button fx:id="btn_menu" maxHeight="1.7976931348623157E308" maxWidth="300.0" mnemonicParsing="false" onAction="#goMenu" prefHeight="25.0" prefWidth="156.0" text="Menu" />
-            <Button fx:id="btn_category" maxHeight="1.7976931348623157E308" maxWidth="300.0" mnemonicParsing="false" onAction="#goCategory" prefHeight="25.0" prefWidth="156.0" text="Category" />
+            <Button fx:id="btn_employee" mnemonicParsing="false" onAction="#goEmployee" prefHeight="25.0" prefWidth="156.0" text="Employee" />
+            <Button fx:id="btn_branch" mnemonicParsing="false" onAction="#goBranch" prefHeight="25.0" prefWidth="156.0" text="Branch" />
+            <Button fx:id="btn_inventory" mnemonicParsing="false" onAction="#goInventory" prefHeight="25.0" prefWidth="156.0" text="Inventory" />
+            <Button fx:id="btn_customer" mnemonicParsing="false" onAction="#goCustomer" prefHeight="25.0" prefWidth="156.0" text="Customer" />
+            <Button fx:id="btn_payment" mnemonicParsing="false" onAction="#goPayment" prefHeight="25.0" prefWidth="156.0" text="Payment" />
+            <Button fx:id="btn_customization" mnemonicParsing="false" onAction="#goCustomization" prefHeight="25.0" prefWidth="156.0" text="Customization" />
+            <Button fx:id="btn_menu" mnemonicParsing="false" onAction="#goMenu" prefHeight="25.0" prefWidth="156.0" text="Menu" />
+            <Button fx:id="btn_category" mnemonicParsing="false" onAction="#goCategory" prefHeight="25.0" prefWidth="156.0" text="Category" />
          </children>
       </VBox>
       <ButtonBar prefHeight="40.0" prefWidth="200.0" />
