@@ -1,14 +1,106 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="CONTROLLER_NAME"
-            prefHeight="400.0" prefWidth="600.0">
+<BorderPane prefHeight="720"
+            prefWidth="1280"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1">
 
-</AnchorPane>
+    <left>
+
+        <VBox spacing="15"
+              prefWidth="320"
+              style="-fx-background-color:#F4F4F4;">
+
+            <padding>
+                <Insets top="25" left="20" right="20"/>
+            </padding>
+
+            <Label text="Form Menu">
+
+                <font>
+                    <Font size="24"/>
+                </font>
+
+            </Label>
+
+            <Label text="Menu ID"/>
+            <TextField/>
+
+            <Label text="Menu Name"/>
+            <TextField/>
+
+            <Label text="Price"/>
+            <TextField/>
+
+            <Label text="Category"/>
+            <TextField/>
+
+            <HBox spacing="10">
+
+                <Button text="ADD"
+                        prefWidth="90"
+                        style="-fx-background-color:#2ECC71; -fx-text-fill:white;"/>
+
+                <Button text="UPDATE"
+                        prefWidth="90"
+                        style="-fx-background-color:#3498DB; -fx-text-fill:white;"/>
+
+                <Button text="DELETE"
+                        prefWidth="90"
+                        style="-fx-background-color:#E74C3C; -fx-text-fill:white;"/>
+
+            </HBox>
+
+        </VBox>
+
+    </left>
+
+    <center>
+
+        <VBox spacing="15">
+
+            <padding>
+                <Insets top="20" left="20" right="20"/>
+            </padding>
+
+            <Label text="Menu List">
+
+                <font>
+                    <Font size="26"/>
+                </font>
+
+            </Label>
+
+            <HBox spacing="10">
+
+                <TextField HBox.hgrow="ALWAYS"
+                           promptText="Search menu"/>
+
+                <Button text="SEARCH"/>
+                <Button text="RESET"/>
+
+            </HBox>
+
+            <TableView VBox.vgrow="ALWAYS">
+
+                <columns>
+
+                    <TableColumn text="ID" prefWidth="100"/>
+                    <TableColumn text="Menu Name" prefWidth="250"/>
+                    <TableColumn text="Price" prefWidth="200"/>
+                    <TableColumn text="Category" prefWidth="200"/>
+
+                </columns>
+
+            </TableView>
+
+        </VBox>
+
+    </center>
+
+</BorderPane>
