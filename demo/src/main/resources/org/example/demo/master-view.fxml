@@ -8,11 +8,11 @@
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.MasterController">
    <children>
       <Button fx:id="btn_customer" layoutX="214.0" layoutY="175.0" mnemonicParsing="false" onAction="#goCustomer" prefHeight="25.0" prefWidth="156.0" text="Customer" />
-      <Button fx:id="btn_payment" layoutX="214.0" layoutY="210.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="156.0" text="Payment" />
-      <Button fx:id="btn_customization" layoutX="214.0" layoutY="248.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="156.0" text="Cuztomization" />
+      <Button fx:id="btn_payment" layoutX="214.0" layoutY="210.0" mnemonicParsing="false" onAction="#goPayment" prefHeight="25.0" prefWidth="156.0" text="Payment" />
+      <Button fx:id="btn_customization" layoutX="214.0" layoutY="248.0" mnemonicParsing="false" onAction="#goCustomization" prefHeight="25.0" prefWidth="156.0" text="Cuztomization" />
       <Button fx:id="btn_menu" layoutX="214.0" layoutY="285.0" mnemonicParsing="false" onAction="#goMenu" prefHeight="25.0" prefWidth="156.0" text="Menu" />
-      <Button fx:id="btn_category" layoutX="214.0" layoutY="320.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="156.0" text="Category" />
-      <Button fx:id="btn_inventory" layoutX="214.0" layoutY="139.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="156.0" text="Inventory" />
+      <Button fx:id="btn_category" layoutX="214.0" layoutY="320.0" mnemonicParsing="false" onAction="#goCategory" prefHeight="25.0" prefWidth="156.0" text="Category" />
+      <Button fx:id="btn_inventory" layoutX="214.0" layoutY="139.0" mnemonicParsing="false" onAction="#goInventory" prefHeight="25.0" prefWidth="156.0" text="Inventory" />
       <Button fx:id="btn_branch" layoutX="214.0" layoutY="105.0" mnemonicParsing="false" onAction="#goBranch" prefHeight="25.0" prefWidth="156.0" text="Branch" />
       <Button fx:id="btn_employee" layoutX="214.0" layoutY="68.0" mnemonicParsing="false" onAction="#goEmployee" prefHeight="25.0" prefWidth="156.0" text="Employee" />
       <ButtonBar prefHeight="40.0" prefWidth="200.0" />

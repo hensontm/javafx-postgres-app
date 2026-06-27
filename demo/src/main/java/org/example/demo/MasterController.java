@@ -77,6 +77,17 @@ public class MasterController {
         stage.show();
     }
 
+    //Inventory
+    @FXML
+    public void goInventory(ActionEvent e) throws IOException{
+        root = FXMLLoader.load(getClass().getResource("inventory-view.fxml"));
+        stage = (Stage) ((Node)e.getSource()).getScene().getWindow();
+        scene = new Scene(root);
+
+        stage.setScene(scene);
+        stage.show();
+    }
+
     //Customer
     @FXML
     public void goCustomer(ActionEvent e) throws IOException{
@@ -88,10 +99,43 @@ public class MasterController {
         stage.show();
     }
 
+    //Payment
+    @FXML
+    public void goPayment(ActionEvent e) throws IOException{
+        root = FXMLLoader.load(getClass().getResource("payment-view.fxml"));
+        stage = (Stage) ((Node)e.getSource()).getScene().getWindow();
+        scene = new Scene(root);
+
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    //Customization
+    @FXML
+    public void goCustomization(ActionEvent e) throws IOException{
+        root = FXMLLoader.load(getClass().getResource("customization-view.fxml"));
+        stage = (Stage) ((Node)e.getSource()).getScene().getWindow();
+        scene = new Scene(root);
+
+        stage.setScene(scene);
+        stage.show();
+    }
+
     //Menu
     @FXML
     public void goMenu(ActionEvent e) throws IOException{
         root = FXMLLoader.load(getClass().getResource("menu-view.fxml"));
+        stage = (Stage) ((Node)e.getSource()).getScene().getWindow();
+        scene = new Scene(root);
+
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    //Category
+    @FXML
+    public void goCategory(ActionEvent e) throws IOException{
+        root = FXMLLoader.load(getClass().getResource("category-view.fxml"));
         stage = (Stage) ((Node)e.getSource()).getScene().getWindow();
         scene = new Scene(root);
 
