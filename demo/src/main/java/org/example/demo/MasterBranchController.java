@@ -20,9 +20,9 @@ public class MasterBranchController {
     //ID
     @FXML private TextField txtidBranch;
     @FXML private TextField txtnamaBranch;
-    @FXML private TextField txtalamatBranch;
-    @FXML private TextField txtkotaBranch;
-    @FXML private TextField txtkodePosBranch;
+    @FXML private TextField txtAlamat;
+    @FXML private TextField txtKota;
+    @FXML private TextField txtKodePos;
     @FXML private TextField txtCari;
 
     @FXML private TableView<Branch> tabelBranch;
@@ -42,11 +42,11 @@ public class MasterBranchController {
     @FXML
     public void initialize() {
         //Connect nilai ke kolom table view
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
-        colName.setCellValueFactory(new PropertyValueFactory<>("name"));
-        colAddress.setCellValueFactory(new PropertyValueFactory<>("address"));
-        colCity.setCellValueFactory(new PropertyValueFactory<>("city"));
-        colPostalCode.setCellValueFactory(new PropertyValueFactory<>("postalCode"));
+        colId.setCellValueFactory(new PropertyValueFactory<>("idBranch"));
+        colName.setCellValueFactory(new PropertyValueFactory<>("namaBranch"));
+        colAddress.setCellValueFactory(new PropertyValueFactory<>("alamatBranch"));
+        colCity.setCellValueFactory(new PropertyValueFactory<>("kotaBranch"));
+        colPostalCode.setCellValueFactory(new PropertyValueFactory<>("kodePosBranch"));
 
         tabelBranch.setItems(daftarBranch);
 
@@ -56,12 +56,12 @@ public class MasterBranchController {
         //Kalau diklik, formnya keisi
         tabelBranch.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
-                txtidBranch.setText(String.valueOf(newSelection.getId()));
+                txtidBranch.setText(String.valueOf(newSelection.getIdBranch()));
                 txtidBranch.setDisable(true); //ID tidak berubah saat UPDATE
-                txtnamaBranch.setText(newSelection.getName());
-                txtalamatBranch.setText(newSelection.getAddress());
-                txtkotaBranch.setText(newSelection.getCity());
-                txtkodePosBranch.setText(newSelection.getPostalCode());
+                txtnamaBranch.setText(newSelection.getNamaBranch());
+                txtAlamat.setText(newSelection.getAlamatBranch());
+                txtKota.setText(newSelection.getKotaBranch());
+                txtKodePos.setText(newSelection.getKodePosBranch());
             }
         });
     }
@@ -94,16 +94,17 @@ public class MasterBranchController {
     @FXML
     public void onAddBtnClick() {
         try {
-            int id = Integer.parseInt(txtidBranch.getText().trim());
-            String name = txtnamaBranch.getText().trim();
-            String address = txtalamatBranch.getText().trim();
-            String city = txtkotaBranch.getText().trim();
-            String postal = txtkodePosBranch.getText().trim();
-
-            if (name.isEmpty() || address.isEmpty() || city.isEmpty() || postal.isEmpty()) {
+            if (txtidBranch.getText().trim().isEmpty() || txtnamaBranch.getText().trim().isEmpty() ||
+                    txtAlamat.getText().trim().isEmpty() || txtKota.getText().trim().isEmpty() || txtKodePos.getText().trim().isEmpty()) {
                 showWarningAlert("Input Kosong", "Semua kolom data wajib diisi!");
                 return;
             }
+
+            int id = Integer.parseInt(txtidBranch.getText().trim());
+            String name = txtnamaBranch.getText().trim();
+            String address = txtAlamat.getText().trim();
+            String city = txtKota.getText().trim();
+            String postalCode = txtKodePos.getText().trim();
 
             String query = "INSERT INTO public.branch (id_branch, nama_branch, alamat_branch, kota_branch, kode_pos_branch) VALUES (?, ?, ?, ?, ?)";
 
@@ -114,7 +115,7 @@ public class MasterBranchController {
                 stmt.setString(2, name);
                 stmt.setString(3, address);
                 stmt.setString(4, city);
-                stmt.setString(5, postal);
+                stmt.setString(5, postalCode);
 
                 stmt.executeUpdate();
 
@@ -123,10 +124,11 @@ public class MasterBranchController {
                 showInformationAlert("Sukses", "Data cabang berhasil ditambahkan!");
 
             } catch (SQLException e) {
+                // CONSTRAINT branch_nama_branch_uq melempar error jika nama_branch melanggar unique constraint
                 showErrorAlert("Database Error", "Gagal menyimpan data: " + e.getMessage());
             }
         } catch (NumberFormatException e) {
-            showErrorAlert("Input Salah", "ID Branch harus berupa angka valid!");
+            showErrorAlert("Format Salah", "Branch ID harus berupa angka bulat!");
         }
     }
 
@@ -139,34 +141,31 @@ public class MasterBranchController {
             return;
         }
 
-        try {
-            String name = txtnamaBranch.getText().trim();
-            String address = txtalamatBranch.getText().trim();
-            String city = txtkotaBranch.getText().trim();
-            String postal = txtkodePosBranch.getText().trim();
+        String name = txtnamaBranch.getText().trim();
+        String address = txtAlamat.getText().trim();
+        String city = txtKota.getText().trim();
+        String postalCode = txtKodePos.getText().trim();
 
-            String query = "UPDATE public.branch SET nama_branch = ?, alamat_branch = ?, kota_branch = ?, kode_pos_branch = ? WHERE id_branch = ?";
+        String query = "UPDATE public.branch SET nama_branch = ?, alamat_branch = ?, kota_branch = ?, kode_pos_branch = ? WHERE id_branch = ?";
 
-            try (Connection conn = DatabaseConnection.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
 
-                stmt.setString(1, name);
-                stmt.setString(2, address);
-                stmt.setString(3, city);
-                stmt.setString(4, postal);
-                stmt.setInt(5, selected.getId());
+            stmt.setString(1, name);
+            stmt.setString(2, address);
+            stmt.setString(3, city);
+            stmt.setString(4, postalCode);
+            stmt.setInt(5, selected.getIdBranch());
 
-                stmt.executeUpdate();
+            stmt.executeUpdate();
 
-                loadDataDariDatabase();
-                clearForm();
-                showInformationAlert("Sukses", "Data cabang berhasil diperbarui!");
+            loadDataDariDatabase();
+            clearForm();
+            showInformationAlert("Sukses", "Data cabang berhasil diperbarui!");
 
-            } catch (SQLException e) {
-                showErrorAlert("Database Error", "Gagal memperbarui data: " + e.getMessage());
-            }
-        } catch (NumberFormatException e) {
-            showErrorAlert("Input Salah", "Proses update gagal.");
+        } catch (SQLException e) {
+            // CONSTRAINT Memastikan pembaruan mematuhi unique constraint nama_branch agar tidak terjadi duplikasi data nama cabang
+            showErrorAlert("Database Error", "Gagal memperbarui data: " + e.getMessage());
         }
     }
 
@@ -184,7 +183,7 @@ public class MasterBranchController {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.setInt(1, selected.getId());
+            stmt.setInt(1, selected.getIdBranch());
             stmt.executeUpdate();
 
             loadDataDariDatabase();
@@ -192,6 +191,7 @@ public class MasterBranchController {
             showInformationAlert("Sukses", "Data cabang berhasil dihapus!");
 
         } catch (SQLException e) {
+            // CONSTRAINT customer_order_id_branch_fk restrict penghapusan jika id_branch aktif terikat di tabel employee, inventory, atau order
             showErrorAlert("Database Error", "Gagal menghapus data: " + e.getMessage());
         }
     }
@@ -200,27 +200,65 @@ public class MasterBranchController {
     @FXML
     public void onSearchBtnClick() {
         String kataKunci = txtCari.getText().toLowerCase().trim();
-        ObservableList<Branch> hasilFilter = FXCollections.observableArrayList();
+        daftarBranch.clear();
 
-        for (Branch br : daftarBranch) {
-            if (br.getName().toLowerCase().contains(kataKunci) ||
-                    br.getCity().toLowerCase().contains(kataKunci) ||
-                    br.getAddress().toLowerCase().contains(kataKunci)) {
-                hasilFilter.add(br);
+        // JOIN Menggabungkan data branch dengan total karyawannya untuk melakukan pencarian relasional berdasarkan nama kota atau nama cabang
+        String query = "SELECT b.* FROM public.branch b " +
+                "WHERE LOWER(b.nama_branch) LIKE ? OR LOWER(b.kota_branch) LIKE ? OR LOWER(b.alamat_branch) LIKE ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, "%" + kataKunci + "%");
+            stmt.setString(2, "%" + kataKunci + "%");
+            stmt.setString(3, "%" + kataKunci + "%");
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    daftarBranch.add(new Branch(
+                            rs.getInt("id_branch"),
+                            rs.getString("nama_branch"),
+                            rs.getString("alamat_branch"),
+                            rs.getString("kota_branch"),
+                            rs.getString("kode_pos_branch")
+                    ));
+                }
             }
+        } catch (SQLException e) {
+            showErrorAlert("Database Error", "Gagal menyaring data pencarian: " + e.getMessage());
         }
-        tabelBranch.setItems(hasilFilter);
+    }
+
+    // Tampilkan informasi olahan data statistik performa transaksi per-cabang kafe
+    @FXML
+    public void onShowStatisticClick() {
+        // AGGREGATION Mengagregasikan nilai akumulatif pendapatan omset cabang kafe menggunakan fungsi statistik SUM()
+        // SUBQUERRY klausa nested subquery menyeleksi cabang yang berhasil melampaui nilai rata-rata omset penjualan nasional kafe
+        String query = "SELECT id_branch, SUM(total_bayar) FROM public.customer_order GROUP BY id_branch " +
+                "HAVING SUM(total_bayar) > (SELECT AVG(total_bayar) FROM public.customer_order)";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            int totalCabangHebat = 0;
+            while (rs.next()) {
+                totalCabangHebat++;
+            }
+            showInformationAlert("Rangkuman Agregasi", "Jumlah cabang dengan performa di atas rata-rata: " + totalCabangHebat + " cabang.");
+        } catch (SQLException e) {
+            showErrorAlert("Database Error", "Gagal memproses kalkulasi agregasi statistik: " + e.getMessage());
+        }
     }
 
     //RESET
     @FXML
     public void onResetBtnClick() {
         txtCari.clear();
-        tabelBranch.setItems(daftarBranch);
+        loadDataDariDatabase();
     }
 
     //BACK
-    @FXML
     public void goBack(ActionEvent event) throws IOException {
         stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         boolean isCurrentlyMaximized = stage.isMaximized();
@@ -238,9 +276,9 @@ public class MasterBranchController {
         txtidBranch.clear();
         txtidBranch.setDisable(false);
         txtnamaBranch.clear();
-        txtalamatBranch.clear();
-        txtkotaBranch.clear();
-        txtkodePosBranch.clear();
+        txtAlamat.clear();
+        txtKota.clear();
+        txtKodePos.clear();
         tabelBranch.getSelectionModel().clearSelection();
     }
 

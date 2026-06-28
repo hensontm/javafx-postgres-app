@@ -71,7 +71,7 @@
             <TableView fx:id="tabelInventory" VBox.vgrow="ALWAYS">
                 <columns>
                     <TableColumn fx:id="colId" prefWidth="204.5" text="ID" />
-                    <TableColumn fx:id="colStok" prefWidth="236.0" text="Stock" />
+                    <TableColumn fx:id="colStock" prefWidth="236.0" text="Stock" />
                     <TableColumn fx:id="colIdMenu" prefWidth="222.0" text="Menu ID" />
                     <TableColumn fx:id="colIdBranch" prefWidth="256.5" text="Branch ID" />
                 </columns>

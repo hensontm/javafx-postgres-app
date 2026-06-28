@@ -2,29 +2,29 @@ package org.example.demo;
 
 public class Customer {
     //Attributes
-    private int id;
-    private String name;
-    private String phone;
-    private String email;
+    private int idCust;
+    private String namaCust;
+    private String telpCust;
+    private String emailCust;
 
     //Constructor
-    public Customer(int id, String name, String phone, String email) {
-        this.id = id;
-        this.name = name;
-        this.phone = phone;
-        this.email = email;
+    public Customer(int idCust, String namaCust, String telpCust, String emailCust) {
+        this.idCust = idCust;
+        this.namaCust = namaCust;
+        this.telpCust = telpCust;
+        this.emailCust = emailCust;
     }
 
     //GS
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public int getIdCust() { return idCust; }
+    public void setIdCust(int idCust) { this.idCust = idCust; }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public String getNamaCust() { return namaCust; }
+    public void setNamaCust(String namaCust) { this.namaCust = namaCust; }
 
-    public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
+    public String getTelpCust() { return telpCust; }
+    public void setTelpCust(String telpCust) { this.telpCust = telpCust; }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public String getEmailCust() { return emailCust; }
+    public void setEmailCust(String emailCust) { this.emailCust = emailCust; }
 }

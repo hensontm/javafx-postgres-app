@@ -60,7 +60,7 @@ public class MasterEmployeeController {
         tabelEmployee.setItems(daftarEmployee);
 
         //Isi combobox
-        comboPosition.getItems().addAll("Manager", "Staff", "Supervisor", "Developer", "Barista");
+        comboPosition.getItems().addAll("Manager", "Barista"); // CONSTRAINT employee_jabatan_employee_ck wajib 'Manager' atau 'Barista'
 
         //Load data PosgreSQL
         loadDataDariDatabase();
@@ -126,6 +126,12 @@ public class MasterEmployeeController {
                 return;
             }
 
+            // CONSTRAINT employee_gaji_employee_ck nilai gaji tidak boleh bernilai negatif (>= 0)
+            if (salary < 0) {
+                showWarningAlert("Pelanggaran Constraint", "Gaji tidak boleh negatif!");
+                return;
+            }
+
             String query = "INSERT INTO public.employee (id_employee, nama_employee, jabatan_employee, gaji_employee, tanggal_lahir_employee, alamat_employee, id_branch, telp_employee) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
             try (Connection conn = DatabaseConnection.getConnection();
@@ -147,6 +153,7 @@ public class MasterEmployeeController {
                 showInformationAlert("Sukses", "Data karyawan berhasil ditambahkan!");
 
             } catch (SQLException e) {
+                // CONSTRAINT employee_id_branch_fk validasi foreign key branch dan employee_telp_employee_uq unique phone
                 showErrorAlert("Database Error", "Gagal menyimpan data: " + e.getMessage());
             }
         } catch (IllegalArgumentException e) {
@@ -172,6 +179,12 @@ public class MasterEmployeeController {
             int idBranch = Integer.parseInt(txtidBranch.getText().trim());
             String phone = txtTelp.getText().trim();
 
+            // CONSTRAINT employee_gaji_employee_ck memastikan nilai gaji baru valid (>= 0)
+            if (salary < 0) {
+                showWarningAlert("Pelanggaran Constraint", "Gaji tidak boleh negatif!");
+                return;
+            }
+
             String query = "UPDATE public.employee SET nama_employee = ?, jabatan_employee = ?, gaji_employee = ?, tanggal_lahir_employee = ?, alamat_employee = ?, id_branch = ?, telp_employee = ? WHERE id_employee = ?";
 
             try (Connection conn = DatabaseConnection.getConnection();
@@ -193,6 +206,7 @@ public class MasterEmployeeController {
                 showInformationAlert("Sukses", "Data karyawan berhasil diperbarui!");
 
             } catch (SQLException e) {
+                // CONSTRAINT Memastikan update mematuhi aturan unique phone dan foreign key branch_id_branch_pk
                 showErrorAlert("Database Error", "Gagal memperbarui data: " + e.getMessage());
             }
         } catch (IllegalArgumentException e) {
@@ -222,6 +236,7 @@ public class MasterEmployeeController {
             showInformationAlert("Sukses", "Data karyawan berhasil dihapus!");
 
         } catch (SQLException e) {
+            // CONSTRAINT customer_order_id_employee_fk restriksi jika id_employee masih dipakai di transaksi nota
             showErrorAlert("Database Error", "Gagal menghapus data: " + e.getMessage());
         }
     }
@@ -230,23 +245,63 @@ public class MasterEmployeeController {
     @FXML
     public void onSearchBtnClick() {
         String kataKunci = txtCari.getText().toLowerCase().trim();
-        ObservableList<Employee> hasilFilter = FXCollections.observableArrayList();
+        daftarEmployee.clear();
 
-        for (Employee emp : daftarEmployee) {
-            if (emp.getName().toLowerCase().contains(kataKunci) ||
-                    emp.getPosition().toLowerCase().contains(kataKunci) ||
-                    emp.getAddress().toLowerCase().contains(kataKunci)) {
-                hasilFilter.add(emp);
+        // JOIN Menghubungkan tabel employee dengan tabel branch untuk melakukan pencarian silang berdasarkan filter lokasi cabang
+        String query = "SELECT e.* FROM public.employee e JOIN public.branch b ON e.id_branch = b.id_branch " +
+                "WHERE LOWER(e.nama_employee) LIKE ? OR LOWER(e.jabatan_employee) LIKE ? OR LOWER(b.nama_branch) LIKE ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, "%" + kataKunci + "%");
+            stmt.setString(2, "%" + kataKunci + "%");
+            stmt.setString(3, "%" + kataKunci + "%");
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    daftarEmployee.add(new Employee(
+                            rs.getInt("id_employee"),
+                            rs.getString("nama_employee"),
+                            rs.getString("jabatan_employee"),
+                            rs.getDouble("gaji_employee"),
+                            rs.getDate("tanggal_lahir_employee"),
+                            rs.getString("alamat_employee"),
+                            rs.getInt("id_branch"),
+                            rs.getString("telp_employee")
+                    ));
+                }
             }
+        } catch (SQLException e) {
+            showErrorAlert("Database Error", "Gagal melakukan pencarian: " + e.getMessage());
         }
-        tabelEmployee.setItems(hasilFilter);
+    }
+
+    // Tampilkan informasi olahan data statistika performa gaji karyawan
+    @FXML
+    public void onShowStatisticClick() {
+        // AGGREGATION Memanfaatkan fungsi AVG() untuk mencari rata-rata nominal gaji karyawan
+        // SUBQUERRY klausa seleksi bertingkat mencari total karyawan dengan kriteria gaji di atas nilai rata-rata internal
+        String query = "SELECT COUNT(id_employee) FROM public.employee WHERE gaji_employee > (SELECT AVG(gaji_employee) FROM public.employee)";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            if (rs.next()) {
+                int jumlahKaryawan = rs.getInt(1);
+                showInformationAlert("Rangkuman Agregasi", "Jumlah karyawan dengan gaji di atas rata-rata: " + jumlahKaryawan + " orang.");
+            }
+        } catch (SQLException e) {
+            showErrorAlert("Database Error", "Gagal memproses kalkulasi agregasi: " + e.getMessage());
+        }
     }
 
     //RESET
     @FXML
     public void onResetBtnClick() {
         txtCari.clear();
-        tabelEmployee.setItems(daftarEmployee);
+        loadDataDariDatabase();
     }
 
     //BACK

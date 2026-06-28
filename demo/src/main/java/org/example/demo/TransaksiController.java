@@ -20,6 +20,7 @@ public class TransaksiController {
     //ID
     @FXML private TextField txtNamaCust;
     @FXML private TextField txtTelpCust;
+    @FXML private TextField txtEmailCust; // Ditambahkan untuk melengkapi constraint NOT NULL & UNIQUE email_cust
     @FXML private ComboBox<String> comboBranch;
     @FXML private ComboBox<String> comboEmployee;
     @FXML private ComboBox<String> comboPayment;
@@ -75,6 +76,10 @@ public class TransaksiController {
         loadDropdownPayment();
         loadDropdownMenu();
         loadDropdownCustomization();
+
+        // Listener dinamis agar total bayar terupdate real-time saat diskon diisi atau payment diubah
+        txtDiskon.textProperty().addListener((observable, oldValue, newValue) -> updateTotalBayarLabel());
+        comboPayment.valueProperty().addListener((observable, oldValue, newValue) -> updateTotalBayarLabel());
     }
 
     //Customization
@@ -86,30 +91,41 @@ public class TransaksiController {
             return;
         }
 
-        int qtyInput = Integer.parseInt(txtQtyCustom.getText().trim());
-        int customId = Integer.parseInt(selectedCustomName.split(" - ")[0]);
-        String namaAsliCustom = selectedCustomName.split(" - ")[1];
-        double hargaSatuan = getCustomPriceFromDB(customId);
+        try {
+            int qtyInput = Integer.parseInt(txtQtyCustom.getText().trim());
 
-        CartCustomization dataLama = null;
-        for (CartCustomization c : listKustomisasiSementara) {
-            if (c.getCustomId() == customId) {
-                dataLama = c;
-                break;
+            //CONSTRAINT jumlah_order_customization > 0
+            if (qtyInput < 0) {
+                showWarningAlert("Pelanggaran Constraint", "Jumlah kustomisasi tidak boleh kurang dari 0!");
+                return;
             }
-        }
 
-        if (qtyInput == 0) {
-            if (dataLama != null) listKustomisasiSementara.remove(dataLama);
-        } else {
-            if (dataLama != null) {
-                dataLama.setQty(qtyInput);
-                dataLama.setTotalPrice(hargaSatuan * qtyInput);
+            int customId = Integer.parseInt(selectedCustomName.split(" - ")[0]);
+            String namaAsliCustom = selectedCustomName.split(" - ")[1];
+            double hargaSatuan = getCustomPriceFromDB(customId);
+
+            CartCustomization dataLama = null;
+            for (CartCustomization c : listKustomisasiSementara) {
+                if (c.getCustomId() == customId) {
+                    dataLama = c;
+                    break;
+                }
+            }
+
+            if (qtyInput == 0) {
+                if (dataLama != null) listKustomisasiSementara.remove(dataLama);
             } else {
-                listKustomisasiSementara.add(new CartCustomization(customId, namaAsliCustom, qtyInput, hargaSatuan * qtyInput));
+                if (dataLama != null) {
+                    dataLama.setQty(qtyInput);
+                    dataLama.setTotalPrice(hargaSatuan * qtyInput);
+                } else {
+                    listKustomisasiSementara.add(new CartCustomization(customId, namaAsliCustom, qtyInput, hargaSatuan * qtyInput));
+                }
             }
+            tabelKustomisasiSementara.refresh();
+        } catch (NumberFormatException e) {
+            showWarningAlert("Format Salah", "Quantity kustomisasi harus berupa angka bulat!");
         }
-        tabelKustomisasiSementara.refresh();
     }
 
     //Tamabah Item ke Tabel/Keranjang Utama
@@ -121,25 +137,36 @@ public class TransaksiController {
             return;
         }
 
-        int menuId = Integer.parseInt(selectedMenuName.split(" - ")[0]);
-        String namaAsliMenu = selectedMenuName.split(" - ")[1];
-        double hargaMenu = getMenuPriceFromDB(menuId);
-        int qtyMenu = Integer.parseInt(txtQtyMenu.getText().trim());
+        try {
+            int qtyMenu = Integer.parseInt(txtQtyMenu.getText().trim());
 
-        CartItem newItem = new CartItem(menuId, namaAsliMenu, qtyMenu, hargaMenu);
-        for (CartCustomization cc : listKustomisasiSementara) {
-            newItem.addCustomization(cc);
+            // Validasi constraint order_detail jumlah_detail > 0
+            if (qtyMenu <= 0) {
+                showWarningAlert("Pelanggaran Constraint", "Jumlah beli menu harus lebih dari 0!");
+                return;
+            }
+
+            int menuId = Integer.parseInt(selectedMenuName.split(" - ")[0]);
+            String namaAsliMenu = selectedMenuName.split(" - ")[1];
+            double hargaMenu = getMenuPriceFromDB(menuId);
+
+            CartItem newItem = new CartItem(menuId, namaAsliMenu, qtyMenu, hargaMenu);
+            for (CartCustomization cc : listKustomisasiSementara) {
+                newItem.addCustomization(cc);
+            }
+
+            listKeranjangUtama.add(newItem);
+
+            listKustomisasiSementara.clear();
+            comboMenu.setValue(null);
+            txtQtyMenu.clear();
+            comboCustomization.setValue(null);
+            txtQtyCustom.clear();
+
+            updateTotalBayarLabel();
+        } catch (NumberFormatException e) {
+            showWarningAlert("Format Salah", "Quantity menu harus berupa angka bulat!");
         }
-
-        listKeranjangUtama.add(newItem);
-
-        listKustomisasiSementara.clear();
-        comboMenu.setValue(null);
-        txtQtyMenu.clear();
-        comboCustomization.setValue(null);
-        txtQtyCustom.clear();
-
-        updateTotalBayarLabel();
     }
 
     @FXML
@@ -156,16 +183,33 @@ public class TransaksiController {
         for (CartItem item : listKeranjangUtama) {
             total += item.getTotalPrice();
         }
-        double diskon = txtDiskon.getText().trim().isEmpty() ? 0 : Double.parseDouble(txtDiskon.getText().trim());
-        lblTotalBayar.setText("Rp " + (total - diskon));
+
+        double diskonResto = 0.0;
+        if (!txtDiskon.getText().trim().isEmpty()) {
+            try {
+                diskonResto = Double.parseDouble(txtDiskon.getText().trim());
+            } catch (NumberFormatException e) { diskonResto = 0.0; }
+        }
+
+        double diskonPayment = 0.0;
+        if (comboPayment.getValue() != null) {
+            int idPayment = Integer.parseInt(comboPayment.getValue().split(" - ")[0]);
+            diskonPayment = getPaymentDiscountFromDB(idPayment);
+        }
+
+        // Penerapan rumus perhitungan diskon bertingkat akumulatif dari database revisi baru
+        double totalBayarFinal = total * ((100.0 - diskonResto) / 100.0) * ((100.0 - diskonPayment) / 100.0);
+        totalBayarFinal = Math.round(totalBayarFinal * 100.0) / 100.0; // ROUND(..., 2)
+
+        lblTotalBayar.setText("Rp " + totalBayarFinal);
     }
 
     //Commit ke PosgreSQL
     @FXML
     public void onAddTransactionFinalClick() {
-        if (listKeranjangUtama.isEmpty() || txtNamaCust.getText().trim().isEmpty() ||
+        if (listKeranjangUtama.isEmpty() || txtNamaCust.getText().trim().isEmpty() || txtEmailCust.getText().trim().isEmpty() ||
                 comboBranch.getValue() == null || comboEmployee.getValue() == null || comboPayment.getValue() == null) {
-            showWarningAlert("Gagal Simpan", "Keranjang kosong atau identitas nota belum dilengkapi!");
+            showWarningAlert("Gagal Simpan", "Keranjang kosong atau identitas nota & email belum dilengkapi!");
             return;
         }
 
@@ -174,19 +218,32 @@ public class TransaksiController {
             conn = DatabaseConnection.getConnection();
             conn.setAutoCommit(false);
 
-            int customerId = checkOrInsertCustomer(conn, txtNamaCust.getText().trim(), txtTelpCust.getText().trim());
+            // Menyesuaikan parameter input ke database sesuai dengan skema tabel customer yang baru
+            int customerId = checkOrInsertCustomer(conn, txtNamaCust.getText().trim(), txtTelpCust.getText().trim(), txtEmailCust.getText().trim());
 
             int idBranch = Integer.parseInt(comboBranch.getValue().split(" - ")[0]);
             int idEmployee = Integer.parseInt(comboEmployee.getValue().split(" - ")[0]);
             int idPayment = Integer.parseInt(comboPayment.getValue().split(" - ")[0]);
+
             double diskonResto = txtDiskon.getText().trim().isEmpty() ? 0.0 : Double.parseDouble(txtDiskon.getText().trim());
+            // Validasi CHECK constraint (diskon_restoran >= 0 AND diskon_restoran <= 100)
+            if (diskonResto < 0 || diskonResto > 100) {
+                showWarningAlert("Pelanggaran Constraint", "Diskon restoran harus berada di rentang 0 s/d 100!");
+                conn.rollback();
+                return;
+            }
 
             double totalOrder = 0;
             for (CartItem item : listKeranjangUtama) totalOrder += item.getTotalPrice();
-            double totalBayarFinal = totalOrder - diskonResto;
+
+            double diskonPayment = getPaymentDiscountFromDB(idPayment);
+            double totalBayarFinal = totalOrder * ((100.0 - diskonResto) / 100.0) * ((100.0 - diskonPayment) / 100.0);
+            totalBayarFinal = Math.round(totalBayarFinal * 100.0) / 100.0;
 
             int orderId = getNextId(conn, "SELECT COALESCE(MAX(id_order), 0) + 1 FROM public.customer_order");
-            String queryOrder = "INSERT INTO public.customer_order (id_order, tanggal_order, diskon_restoran, total_order, total_bayar, status_order, id_cust, id_branch, id_employee, id_metode_payment, waktu_order) VALUES (?, CURRENT_DATE, ?, ?, ?, 'Selasai', ?, ?, ?, ?, CURRENT_TIME)";
+
+            // Memperbaiki status dari 'Selasai' menjadi 'Selesai' agar lolos validasi CHECK Constraint public.customer_order
+            String queryOrder = "INSERT INTO public.customer_order (id_order, tanggal_order, waktu_order, diskon_restoran, total_order, total_bayar, status_order, id_cust, id_branch, id_employee, id_metode_payment) VALUES (?, CURRENT_DATE, CURRENT_TIME, ?, ?, ?, 'Selesai', ?, ?, ?, ?)";
 
             try (PreparedStatement stmtOrder = conn.prepareStatement(queryOrder)) {
                 stmtOrder.setInt(1, orderId);
@@ -235,25 +292,28 @@ public class TransaksiController {
             if (conn != null) {
                 try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             }
-            showErrorAlert("Database Error", "Transaksi gagal disimpan: " + e.getMessage());
+            showErrorAlert("Database Constraint Error", "Gagal menyimpan transaksi! Periksa kelayakan constraint data.\nDetail: " + e.getMessage());
         }
     }
 
-    private int checkOrInsertCustomer(Connection conn, String nama, String telp) throws SQLException {
-        String checkQuery = "SELECT id_customer FROM public.customer WHERE LOWER(nama_customer) = LOWER(?) AND telp_customer = ?";
+    // Menyesuaikan proses pencarian & insert data customer berdasarkan nama kolom skema asli DDL
+    private int checkOrInsertCustomer(Connection conn, String nama, String telp, String email) throws SQLException {
+        String checkQuery = "SELECT id_cust FROM public.customer WHERE LOWER(nama_cust) = LOWER(?) OR telp_cust = ? OR email_cust = ?";
         try (PreparedStatement stmt = conn.prepareStatement(checkQuery)) {
             stmt.setString(1, nama);
             stmt.setString(2, telp);
+            stmt.setString(3, email);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) return rs.getInt("id_customer");
+                if (rs.next()) return rs.getInt("id_cust");
             }
         }
-        int newCustId = getNextId(conn, "SELECT COALESCE(MAX(id_customer), 0) + 1 FROM public.customer");
-        String insertQuery = "INSERT INTO public.customer (id_customer, nama_customer, telp_customer) VALUES (?, ?, ?)";
+        int newCustId = getNextId(conn, "SELECT COALESCE(MAX(id_cust), 0) + 1 FROM public.customer");
+        String insertQuery = "INSERT INTO public.customer (id_cust, nama_cust, telp_cust, email_cust) VALUES (?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(insertQuery)) {
             stmt.setInt(1, newCustId);
             stmt.setString(2, nama);
             stmt.setString(3, telp);
+            stmt.setString(4, email);
             stmt.executeUpdate();
         }
         return newCustId;
@@ -266,7 +326,16 @@ public class TransaksiController {
         return 1;
     }
 
-    //Tampilkan Data dari PosgreSQL
+    private double getPaymentDiscountFromDB(int idPayment) {
+        String query = "SELECT diskon_metode_payment FROM public.metode_payment WHERE id_metode_payment = ?";
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, idPayment);
+            try (ResultSet rs = stmt.executeQuery()) { if (rs.next()) return rs.getDouble(1); }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0.0;
+    }
+
+    //Tampilkan Data ComboBox dari PosgreSQL
     private void loadDropdownBranch() {
         loadGenericDropdown("SELECT id_branch, nama_branch FROM public.branch ORDER BY id_branch", comboBranch);
     }
@@ -332,11 +401,12 @@ public class TransaksiController {
         return 0.0;
     }
 
+    //BACK
     @FXML
     public void goBack(ActionEvent event) throws IOException {
         stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         boolean isCurrentlyMaximized = stage.isMaximized();
-        root = FXMLLoader.load(getClass().getResource("hello-view.fxml"));
+        root = FXMLLoader.load(getClass().getResource("transaksi-home-view.fxml"));
         scene = new Scene(root);
         stage.setScene(scene);
         stage.setMaximized(isCurrentlyMaximized);
@@ -344,7 +414,7 @@ public class TransaksiController {
     }
 
     private void clearFullForm() {
-        txtNamaCust.clear(); txtTelpCust.clear(); txtDiskon.clear();
+        txtNamaCust.clear(); txtTelpCust.clear(); txtEmailCust.clear(); txtDiskon.clear();
         comboBranch.setValue(null); comboEmployee.setValue(null); comboPayment.setValue(null);
         listKustomisasiSementara.clear(); listKeranjangUtama.clear(); lblTotalBayar.setText("Rp 0");
     }

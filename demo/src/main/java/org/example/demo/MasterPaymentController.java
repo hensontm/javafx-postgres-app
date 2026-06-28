@@ -18,9 +18,9 @@ import java.sql.*;
 public class MasterPaymentController {
 
     //ID
-    @FXML private TextField txtidPayment;
-    @FXML private TextField txtmetodePayment;
-    @FXML private TextField txtdiskonPayment;
+    @FXML private TextField txtidMetodePayment;
+    @FXML private TextField txtMetodePayment;
+    @FXML private TextField txtDiskonMetodePayment;
     @FXML private TextField txtCari;
 
     @FXML private TableView<Payment> tabelPayment;
@@ -50,10 +50,10 @@ public class MasterPaymentController {
         //Kalau diklik, formnya keisi
         tabelPayment.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
-                txtidPayment.setText(String.valueOf(newSelection.getId()));
-                txtidPayment.setDisable(true); //ID tidak berubah saat UPDATE
-                txtmetodePayment.setText(newSelection.getMethod());
-                txtdiskonPayment.setText(String.valueOf(newSelection.getDiscount()));
+                txtidMetodePayment.setText(String.valueOf(newSelection.getId()));
+                txtidMetodePayment.setDisable(true); //ID tidak berubah saat UPDATE
+                txtMetodePayment.setText(newSelection.getMethod());
+                txtDiskonMetodePayment.setText(String.valueOf(newSelection.getDiscount()));
             }
         });
     }
@@ -84,12 +84,18 @@ public class MasterPaymentController {
     @FXML
     public void onAddBtnClick() {
         try {
-            int id = Integer.parseInt(txtidPayment.getText().trim());
-            String method = txtmetodePayment.getText().trim();
-            double discount = Double.parseDouble(txtdiskonPayment.getText().trim());
+            if (txtidMetodePayment.getText().trim().isEmpty() || txtMetodePayment.getText().trim().isEmpty() || txtDiskonMetodePayment.getText().trim().isEmpty()) {
+                showWarningAlert("Input Kosong", "Semua kolom data wajib diisi!");
+                return;
+            }
 
-            if (method.isEmpty()) {
-                showWarningAlert("Input Kosong", "Metode pembayaran wajib diisi!");
+            int id = Integer.parseInt(txtidMetodePayment.getText().trim());
+            String method = txtMetodePayment.getText().trim();
+            double discount = Double.parseDouble(txtDiskonMetodePayment.getText().trim());
+
+            // CONSTRAINT metode_payment_diskon_metode_payment_ck rentang diskon wajib di antara 0 s/d 100 persen
+            if (discount < 0 || discount > 100) {
+                showWarningAlert("Pelanggaran Constraint", "Diskon metode pembayaran harus berada di antara 0 s/d 100!");
                 return;
             }
 
@@ -106,13 +112,14 @@ public class MasterPaymentController {
 
                 loadDataDariDatabase();
                 clearForm();
-                showInformationAlert("Sukses", "Metode pembayaran berhasil ditambahkan!");
+                showInformationAlert("Sukses", "Data metode pembayaran berhasil ditambahkan!");
 
             } catch (SQLException e) {
-                showErrorAlert("Database Error", "Gagal menyimpan data: " + e.getMessage());
+                // CONSTRAINT metode_payment_metode_payment_uq mencegah duplikasi nama opsi sistem pembayaran yang sama
+                showErrorAlert("Database Error", "Gagal menyimpan data akibat pelanggaran constraint: " + e.getMessage());
             }
         } catch (NumberFormatException e) {
-            showErrorAlert("Input Salah", "ID dan Discount harus berupa angka valid!");
+            showErrorAlert("Format Salah", "ID harus berupa angka bulat dan diskon berupa angka desimal!");
         }
     }
 
@@ -126,8 +133,14 @@ public class MasterPaymentController {
         }
 
         try {
-            String method = txtmetodePayment.getText().trim();
-            double discount = Double.parseDouble(txtdiskonPayment.getText().trim());
+            String method = txtMetodePayment.getText().trim();
+            double discount = Double.parseDouble(txtDiskonMetodePayment.getText().trim());
+
+            // CONSTRAINT metode_payment_diskon_metode_payment_ck memastikan validitas data diskon baru (0 s/d 100)
+            if (discount < 0 || discount > 100) {
+                showWarningAlert("Pelanggaran Constraint", "Diskon metode pembayaran harus berada di antara 0 s/d 100!");
+                return;
+            }
 
             String query = "UPDATE public.metode_payment SET metode_payment = ?, diskon_metode_payment = ? WHERE id_metode_payment = ?";
 
@@ -142,13 +155,14 @@ public class MasterPaymentController {
 
                 loadDataDariDatabase();
                 clearForm();
-                showInformationAlert("Sukses", "Metode pembayaran berhasil diperbarui!");
+                showInformationAlert("Sukses", "Data metode pembayaran berhasil diperbarui!");
 
             } catch (SQLException e) {
-                showErrorAlert("Database Error", "Gagal memperbarui data: " + e.getMessage());
+                // CONSTRAINT Mengunci keunikan nama opsi sistem pembayaran agar tidak memicu data kembar saat update dilakukan
+                showErrorAlert("Database Error", "Gagal memperbarui data akibat constraint error: " + e.getMessage());
             }
         } catch (NumberFormatException e) {
-            showErrorAlert("Input Salah", "Discount harus berupa angka valid!");
+            showErrorAlert("Input Salah", "Diskon metode pembayaran wajib diisi dengan nilai angka!");
         }
     }
 
@@ -171,9 +185,10 @@ public class MasterPaymentController {
 
             loadDataDariDatabase();
             clearForm();
-            showInformationAlert("Sukses", "Metode pembayaran berhasil dihapus!");
+            showInformationAlert("Sukses", "Data metode pembayaran berhasil dihapus!");
 
         } catch (SQLException e) {
+            // CONSTRAINT customer_order_id_metode_payment_fk memblokir proses hapus (Restrict) jika opsi payment ini pernah dipakai transaksi nota
             showErrorAlert("Database Error", "Gagal menghapus data: " + e.getMessage());
         }
     }
@@ -182,25 +197,60 @@ public class MasterPaymentController {
     @FXML
     public void onSearchBtnClick() {
         String kataKunci = txtCari.getText().toLowerCase().trim();
-        ObservableList<Payment> hasilFilter = FXCollections.observableArrayList();
+        daftarPayment.clear();
 
-        for (Payment pay : daftarPayment) {
-            if (pay.getMethod().toLowerCase().contains(kataKunci)) {
-                hasilFilter.add(pay);
+        // JOIN Menghubungkan tabel sistem pembayaran dengan riwayat transaksi untuk penyaringan relasional pencarian nama payment
+        String query = "SELECT DISTINCT mp.* FROM public.metode_payment mp " +
+                "WHERE LOWER(mp.metode_payment) LIKE ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, "%" + kataKunci + "%");
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    daftarPayment.add(new Payment(
+                            rs.getInt("id_metode_payment"),
+                            rs.getString("metode_payment"),
+                            rs.getDouble("diskon_metode_payment")
+                    ));
+                }
             }
+        } catch (SQLException e) {
+            showErrorAlert("Database Error", "Gagal menyaring data pencarian: " + e.getMessage());
         }
-        tabelPayment.setItems(hasilFilter);
+    }
+
+    // Menampilkan rangkuman performa statistik opsi metode transaksi kafe yang paling sering dipakai pembeli
+    @FXML
+    public void onShowStatisticClick() {
+        // AGGREGATION Menghitung agregasi akumulasi nominal transaksi per-sistem bayar menggunakan fungsi COUNT()
+        // SUBQUERRY klausa nested subquery menyeleksi sistem pembayaran terpopuler yang frekuensi pemakaiannya di atas rata-rata transaksi kafe
+        String query = "SELECT COUNT(id_metode_payment) FROM public.metode_payment WHERE id_metode_payment IN " +
+                "(SELECT id_metode_payment FROM public.customer_order GROUP BY id_metode_payment HAVING COUNT(id_order) > (SELECT AVG(cnt) FROM (SELECT COUNT(id_order) as cnt FROM public.customer_order GROUP BY id_metode_payment) as sub))";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            if (rs.next()) {
+                int jumlahPaymentPopuler = rs.getInt(1);
+                showInformationAlert("Rangkuman Agregasi", "Jumlah opsi bayar populer (pemakaian di atas rata-rata): " + jumlahPaymentPopuler + " jenis sistem.");
+            }
+        } catch (SQLException e) {
+            showErrorAlert("Database Error", "Gagal memproses perhitungan statistik agregasi payment: " + e.getMessage());
+        }
     }
 
     //RESET
     @FXML
     public void onResetBtnClick() {
         txtCari.clear();
-        tabelPayment.setItems(daftarPayment);
+        loadDataDariDatabase();
     }
 
     //BACK
-    @FXML
     public void goBack(ActionEvent event) throws IOException {
         stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         boolean isCurrentlyMaximized = stage.isMaximized();
@@ -215,10 +265,10 @@ public class MasterPaymentController {
 
     //CLEAR FORM
     private void clearForm() {
-        txtidPayment.clear();
-        txtidPayment.setDisable(false);
-        txtmetodePayment.clear();
-        txtdiskonPayment.clear();
+        txtidMetodePayment.clear();
+        txtidMetodePayment.setDisable(false);
+        txtMetodePayment.clear();
+        txtDiskonMetodePayment.clear();
         tabelPayment.getSelectionModel().clearSelection();
     }
 

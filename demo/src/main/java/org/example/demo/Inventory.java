@@ -2,25 +2,25 @@ package org.example.demo;
 
 public class Inventory {
     //Attributes
-    private int id;
-    private int stok;
+    private int idInventory;
+    private int stokInventory;
     private int idMenu;
     private int idBranch;
 
     //Constructor
-    public Inventory(int id, int stok, int idMenu, int idBranch) {
-        this.id = id;
-        this.stok = stok;
+    public Inventory(int idInventory, int stokInventory, int idMenu, int idBranch) {
+        this.idInventory = idInventory;
+        this.stokInventory = stokInventory;
         this.idMenu = idMenu;
         this.idBranch = idBranch;
     }
 
     //GS
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public int getIdInventory() { return idInventory; }
+    public void setIdInventory(int idInventory) { this.idInventory = idInventory; }
 
-    public int getStok() { return stok; }
-    public void setStok(int stok) { this.stok = stok; }
+    public int getStokInventory() { return stokInventory; }
+    public void setStokInventory(int stokInventory) { this.stokInventory = stokInventory; }
 
     public int getIdMenu() { return idMenu; }
     public void setIdMenu(int idMenu) { this.idMenu = idMenu; }

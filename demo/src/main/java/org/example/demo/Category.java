@@ -2,19 +2,19 @@ package org.example.demo;
 
 public class Category {
     //Attributes
-    private int id;
-    private String name;
+    private int idCategory;
+    private String namaCategory;
 
     //Constructor
-    public Category(int id, String name) {
-        this.id = id;
-        this.name = name;
+    public Category(int idCategory, String namaCategory) {
+        this.idCategory = idCategory;
+        this.namaCategory = namaCategory;
     }
 
     //GS
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public int getIdCategory() { return idCategory; }
+    public void setIdCategory(int idCategory) { this.idCategory = idCategory; }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public String getNamaCategory() { return namaCategory; }
+    public void setNamaCategory(String namaCategory) { this.namaCategory = namaCategory; }
 }

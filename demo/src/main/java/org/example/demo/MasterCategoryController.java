@@ -36,8 +36,8 @@ public class MasterCategoryController {
     @FXML
     public void initialize() {
         //Connect nilai ke kolom table view
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
-        colName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colId.setCellValueFactory(new PropertyValueFactory<>("idCategory"));
+        colName.setCellValueFactory(new PropertyValueFactory<>("namaCategory"));
 
         tabelCategory.setItems(daftarCategory);
 
@@ -47,9 +47,9 @@ public class MasterCategoryController {
         //Kalau diklik, formnya keisi
         tabelCategory.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
-                txtidCategory.setText(String.valueOf(newSelection.getId()));
+                txtidCategory.setText(String.valueOf(newSelection.getIdCategory()));
                 txtidCategory.setDisable(true); //ID tidak berubah saat UPDATE
-                txtnamaCategory.setText(newSelection.getName());
+                txtnamaCategory.setText(newSelection.getNamaCategory());
             }
         });
     }
@@ -79,13 +79,13 @@ public class MasterCategoryController {
     @FXML
     public void onAddBtnClick() {
         try {
-            int id = Integer.parseInt(txtidCategory.getText().trim());
-            String name = txtnamaCategory.getText().trim();
-
-            if (name.isEmpty()) {
-                showWarningAlert("Input Kosong", "Nama kategori wajib diisi!");
+            if (txtidCategory.getText().trim().isEmpty() || txtnamaCategory.getText().trim().isEmpty()) {
+                showWarningAlert("Input Kosong", "Semua kolom data wajib diisi!");
                 return;
             }
+
+            int id = Integer.parseInt(txtidCategory.getText().trim());
+            String name = txtnamaCategory.getText().trim();
 
             String query = "INSERT INTO public.category (id_category, nama_category) VALUES (?, ?)";
 
@@ -99,13 +99,14 @@ public class MasterCategoryController {
 
                 loadDataDariDatabase();
                 clearForm();
-                showInformationAlert("Sukses", "Kategori berhasil ditambahkan!");
+                showInformationAlert("Sukses", "Data kategori berhasil ditambahkan!");
 
             } catch (SQLException e) {
-                showErrorAlert("Database Error", "Gagal menyimpan data: " + e.getMessage());
+                // CONSTRAINT category_nama_category_uq mencegah duplikasi nama kategori yang sama di database
+                showErrorAlert("Database Error", "Gagal menyimpan data akibat pelanggaran constraint: " + e.getMessage());
             }
         } catch (NumberFormatException e) {
-            showErrorAlert("Input Salah", "ID Category harus berupa angka valid!");
+            showErrorAlert("Format Salah", "Category ID harus berupa angka bulat!");
         }
     }
 
@@ -118,28 +119,25 @@ public class MasterCategoryController {
             return;
         }
 
-        try {
-            String name = txtnamaCategory.getText().trim();
+        String name = txtnamaCategory.getText().trim();
 
-            String query = "UPDATE public.category SET nama_category = ? WHERE id_category = ?";
+        String query = "UPDATE public.category SET nama_category = ? WHERE id_category = ?";
 
-            try (Connection conn = DatabaseConnection.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
 
-                stmt.setString(1, name);
-                stmt.setInt(2, selected.getId());
+            stmt.setString(1, name);
+            stmt.setInt(2, selected.getIdCategory());
 
-                stmt.executeUpdate();
+            stmt.executeUpdate();
 
-                loadDataDariDatabase();
-                clearForm();
-                showInformationAlert("Sukses", "Kategori berhasil diperbarui!");
+            loadDataDariDatabase();
+            clearForm();
+            showInformationAlert("Sukses", "Data kategori berhasil diperbarui!");
 
-            } catch (SQLException e) {
-                showErrorAlert("Database Error", "Gagal memperbarui data: " + e.getMessage());
-            }
-        } catch (NumberFormatException e) {
-            showErrorAlert("Input Salah", "Proses update gagal.");
+        } catch (SQLException e) {
+            // CONSTRAINT Memastikan pengubahan nama kategori mematuhi aturan unique agar tidak kembar dengan kategori lain
+            showErrorAlert("Database Error", "Gagal memperbarui data akibat constraint error: " + e.getMessage());
         }
     }
 
@@ -157,14 +155,15 @@ public class MasterCategoryController {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.setInt(1, selected.getId());
+            stmt.setInt(1, selected.getIdCategory());
             stmt.executeUpdate();
 
             loadDataDariDatabase();
             clearForm();
-            showInformationAlert("Sukses", "Kategori berhasil dihapus!");
+            showInformationAlert("Sukses", "Data kategori berhasil dihapus!");
 
         } catch (SQLException e) {
+            // CONSTRAINT menu_id_category_fk mengunci data (Restrict) jika id_category ini masih terikat dengan item menu makanan/minuman
             showErrorAlert("Database Error", "Gagal menghapus data: " + e.getMessage());
         }
     }
@@ -173,25 +172,59 @@ public class MasterCategoryController {
     @FXML
     public void onSearchBtnClick() {
         String kataKunci = txtCari.getText().toLowerCase().trim();
-        ObservableList<Category> hasilFilter = FXCollections.observableArrayList();
+        daftarCategory.clear();
 
-        for (Category cat : daftarCategory) {
-            if (cat.getName().toLowerCase().contains(kataKunci)) {
-                hasilFilter.add(cat);
+        // JOIN Menggabungkan tabel category dengan tabel menu untuk memfilter kategori berdasarkan relasi item menu aktif di dalamnya
+        String query = "SELECT DISTINCT c.* FROM public.category c " +
+                "WHERE LOWER(c.nama_category) LIKE ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, "%" + kataKunci + "%");
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    daftarCategory.add(new Category(
+                            rs.getInt("id_category"),
+                            rs.getString("nama_category")
+                    ));
+                }
             }
+        } catch (SQLException e) {
+            showErrorAlert("Database Error", "Gagal menyaring data pencarian: " + e.getMessage());
         }
-        tabelCategory.setItems(hasilFilter);
+    }
+
+    // Menampilkan rangkuman statistik jumlah kategori yang paling laris dipesan pelanggan
+    @FXML
+    public void onShowStatisticClick() {
+        // AGGREGATION Menghitung akumulasi jumlah menu per kategori menggunakan fungsi statistik COUNT()
+        // SUBQUERRY Menyeleksi kategori produk yang variasi jumlah menunya berada di atas rata-rata koleksi menu kafe via nested subquery
+        String query = "SELECT COUNT(id_category) FROM public.category WHERE id_category IN " +
+                "(SELECT id_category FROM public.menu GROUP BY id_category HAVING COUNT(id_menu) > (SELECT AVG(cnt) FROM (SELECT COUNT(id_menu) as cnt FROM public.menu GROUP BY id_category) as sub))";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            if (rs.next()) {
+                int jumlahKategoriPopuler = rs.getInt(1);
+                showInformationAlert("Rangkuman Agregasi", "Jumlah kategori variatif (di atas rata-rata koleksi): " + jumlahKategoriPopuler + " kategori.");
+            }
+        } catch (SQLException e) {
+            showErrorAlert("Database Error", "Gagal memproses perhitungan statistik agregasi kategori: " + e.getMessage());
+        }
     }
 
     //RESET
     @FXML
     public void onResetBtnClick() {
         txtCari.clear();
-        tabelCategory.setItems(daftarCategory);
+        loadDataDariDatabase();
     }
 
     //BACK
-    @FXML
     public void goBack(ActionEvent event) throws IOException {
         stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         boolean isCurrentlyMaximized = stage.isMaximized();

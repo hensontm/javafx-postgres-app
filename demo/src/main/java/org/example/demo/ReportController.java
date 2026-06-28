@@ -30,37 +30,75 @@ public class ReportController {
 
     @FXML
     public void initialize() {
+        //Connect nilai ke kolom table view
         this.col1.setCellValueFactory(new PropertyValueFactory("data"));
         this.col2.setCellValueFactory(new PropertyValueFactory("hasil"));
     }
 
     public void riwayatTransaksi() {
+        // Alasan Analisis: Mengetahui preferensi belanja real-time guna menyusun personalisasi program loyalitas konsumen
         this.judulReport.setText("Riwayat Transaksi Customer");
-        String sql = "SELECT\nc.nama_cust,\n'Rp ' || co.total_bayar ||\n' | ' || co.tanggal_order AS detail\nFROM Customer c\nJOIN Customer_Order co\nON c.id_cust = co.id_cust\nORDER BY co.tanggal_order DESC\n";
+
+        // JOIN Menggabungkan entitas data profil pelanggan customer dengan histori transaksi nota penjualan
+        String sql = "SELECT c.nama_cust, 'Rp ' || co.total_bayar || ' | ' || co.tanggal_order AS detail " +
+                "FROM public.customer c JOIN public.customer_order co ON c.id_cust = co.id_cust " +
+                "ORDER BY co.tanggal_order DESC";
+
         this.tampil(sql, "nama_cust", "detail");
     }
 
     public void transaksiCustomer() {
+        // Alasan Analisis: Mendeteksi tingkat keaktifan pelanggan tetap untuk pemberian reward voucer promosi kafe
         this.judulReport.setText("Jumlah Transaksi Customer");
-        String sql = "SELECT\nc.nama_cust,\nCOUNT(co.id_order) jumlah\nFROM Customer c\nJOIN Customer_Order co\nON c.id_cust = co.id_cust\nGROUP BY c.nama_cust\nHAVING COUNT(co.id_order)>1\nORDER BY jumlah DESC\n";
+
+        // JOIN Menghubungkan relasi data antara tabel customer dan riwayat pesanan customer_order
+        // AGGREGATION Melakukan komputasi perhitungan frekuensi belanja per pembeli via fungsi agregat COUNT()
+        String sql = "SELECT c.nama_cust, COUNT(co.id_order)::text AS jumlah " +
+                "FROM public.customer c JOIN public.customer_order co ON c.id_cust = co.id_cust " +
+                "GROUP BY c.nama_cust " +
+                "HAVING COUNT(co.id_order) > 1 " +
+                "ORDER BY jumlah DESC";
+
         this.tampil(sql, "nama_cust", "jumlah");
     }
 
     public void pendapatanCabang() {
+        // Alasan Analisis: Mengukur efisiensi bisnis finansial dan performa pencapaian target profit penjualan omset daerah
         this.judulReport.setText("Pendapatan Cabang");
-        String sql = "SELECT\nb.nama_branch,\nSUM(co.total_bayar) pendapatan\nFROM Branch b\nJOIN Customer_Order co\nON b.id_branch = co.id_branch\nGROUP BY b.nama_branch\n";
+
+        // JOIN Mengintegrasikan data master wilayah cabang toko dengan akumulasi keuangan dari nota pesanan aktif
+        // AGGREGATION Menjumlahkan total nominal dana bersih masuk dari pembeli menggunakan fungsi statistik SUM()
+        String sql = "SELECT b.nama_branch, 'Rp ' || SUM(co.total_bayar) AS pendapatan " +
+                "FROM public.branch b JOIN public.customer_order co ON b.id_branch = co.id_branch " +
+                "GROUP BY b.nama_branch";
+
         this.tampil(sql, "nama_branch", "pendapatan");
     }
 
     public void menuPopuler() {
+        // Alasan Analisis: Menentukan menu andalan paling disukai sebagai landasan utama penyusunan strategi manajemen stok inventaris
         this.judulReport.setText("Menu Paling Populer");
-        String sql = "SELECT\nm.nama_menu,\nSUM(od.jumlah_detail) total\nFROM Menu m\nJOIN Order_Detail od\nON m.id_menu = od.id_menu\nGROUP BY m.nama_menu\nORDER BY total DESC\nLIMIT 5\n";
+
+        // JOIN Mengkolaborasikan data katalog menu kuliner dengan kuantitas item terjual dari order_detail
+        // AGGREGATION Menghitung total volume akumulasi kuantitas produk laku terjual via fungsi agregat SUM()
+        String sql = "SELECT m.nama_menu, SUM(od.jumlah_detail)::text AS total " +
+                "FROM public.menu m JOIN public.order_detail od ON m.id_menu = od.id_menu " +
+                "GROUP BY m.nama_menu " +
+                "ORDER BY total DESC LIMIT 5";
+
         this.tampil(sql, "nama_menu", "total");
     }
 
     public void jamSibuk() {
+        // Alasan Analisis: Mengoptimalkan pengaturan alokasi jam kerja shift barista serta mempercepat efisiensi durasi pelayanan
         this.judulReport.setText("Jam Transaksi Tertinggi");
-        String sql = "SELECT\nEXTRACT(HOUR FROM waktu_order) || ':00' jam,\nCOUNT(id_order) jumlah\nFROM Customer_Order\nGROUP BY jam\nORDER BY jumlah DESC\n";
+
+        // AGGREGATION Menghitung kuantitas intensitas nota pesanan masuk per jam operasional kafe lewat COUNT()
+        // SUBQUERRY Menggunakan evaluasi nested subquery untuk mengelompokkan ekstraksi jam dari field tipe TIME secara valid
+        String sql = "SELECT jam, COUNT(id_order)::text AS jumlah FROM (" +
+                "SELECT EXTRACT(HOUR FROM waktu_order) || ':00' AS jam, id_order FROM public.customer_order) AS sub " +
+                "GROUP BY jam ORDER BY jumlah DESC";
+
         this.tampil(sql, "jam", "jumlah");
     }
 
@@ -76,11 +114,11 @@ public class ReportController {
                 list.add(new Report(rs.getString(kolom1), rs.getString(kolom2)));
             }
 
+            // CONNECT Mengaitkan data koleksi laporan bisnis ke komponen antar-muka JavaFX TableView
             this.tableReport.setItems(list);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     public void goBack(ActionEvent event) throws IOException {

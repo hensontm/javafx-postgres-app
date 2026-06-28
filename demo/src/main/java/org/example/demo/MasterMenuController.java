@@ -20,7 +20,7 @@ public class MasterMenuController {
     //ID
     @FXML private TextField txtidMenu;
     @FXML private TextField txtnamaMenu;
-    @FXML private TextField txthargaMenu;
+    @FXML private TextField txtHargaMenu;
     @FXML private TextField txtidCategory;
     @FXML private TextField txtCari;
 
@@ -40,9 +40,9 @@ public class MasterMenuController {
     @FXML
     public void initialize() {
         //Connect nilai ke kolom table view
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
-        colName.setCellValueFactory(new PropertyValueFactory<>("name"));
-        colPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
+        colId.setCellValueFactory(new PropertyValueFactory<>("idMenu"));
+        colName.setCellValueFactory(new PropertyValueFactory<>("namaMenu"));
+        colPrice.setCellValueFactory(new PropertyValueFactory<>("hargaMenu"));
         colIdCategory.setCellValueFactory(new PropertyValueFactory<>("idCategory"));
 
         tabelMenu.setItems(daftarMenu);
@@ -53,10 +53,10 @@ public class MasterMenuController {
         //Kalau diklik, formnya keisi
         tabelMenu.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
-                txtidMenu.setText(String.valueOf(newSelection.getId()));
+                txtidMenu.setText(String.valueOf(newSelection.getIdMenu()));
                 txtidMenu.setDisable(true); //ID tidak berubah saat UPDATE
-                txtnamaMenu.setText(newSelection.getName());
-                txthargaMenu.setText(String.valueOf(newSelection.getPrice()));
+                txtnamaMenu.setText(newSelection.getNamaMenu());
+                txtHargaMenu.setText(String.valueOf(newSelection.getHargaMenu()));
                 txtidCategory.setText(String.valueOf(newSelection.getIdCategory()));
             }
         });
@@ -89,13 +89,20 @@ public class MasterMenuController {
     @FXML
     public void onAddBtnClick() {
         try {
+            if (txtidMenu.getText().trim().isEmpty() || txtnamaMenu.getText().trim().isEmpty() ||
+                    txtHargaMenu.getText().trim().isEmpty() || txtidCategory.getText().trim().isEmpty()) {
+                showWarningAlert("Input Kosong", "Semua kolom data wajib diisi!");
+                return;
+            }
+
             int id = Integer.parseInt(txtidMenu.getText().trim());
             String name = txtnamaMenu.getText().trim();
-            double price = Double.parseDouble(txthargaMenu.getText().trim());
+            double price = Double.parseDouble(txtHargaMenu.getText().trim());
             int idCategory = Integer.parseInt(txtidCategory.getText().trim());
 
-            if (name.isEmpty()) {
-                showWarningAlert("Input Kosong", "Nama menu wajib diisi!");
+            // CONSTRAINT menu_harga_menu_ck memastikan nominal harga menu wajib di atas nol (> 0)
+            if (price <= 0) {
+                showWarningAlert("Pelanggaran Constraint", "Harga menu harus lebih besar dari 0!");
                 return;
             }
 
@@ -116,10 +123,11 @@ public class MasterMenuController {
                 showInformationAlert("Sukses", "Data menu berhasil ditambahkan!");
 
             } catch (SQLException e) {
-                showErrorAlert("Database Error", "Gagal menyimpan data: " + e.getMessage());
+                // CONSTRAINT menu_nama_menu_uq atau menu_id_category_fk validasi data unik dan kecocokan foreign key id kategori
+                showErrorAlert("Database Error", "Gagal menyimpan data akibat pelanggaran constraint: " + e.getMessage());
             }
         } catch (NumberFormatException e) {
-            showErrorAlert("Input Salah", "ID, Harga, dan ID Kategori harus berupa angka valid!");
+            showErrorAlert("Format Salah", "ID/Harga harus diisi angka!");
         }
     }
 
@@ -128,14 +136,20 @@ public class MasterMenuController {
     public void onUpdateBtnClick() {
         Menu selected = tabelMenu.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            showWarningAlert("Aksi Ditolak", "Pilih data pada tabel yang ingin diubah!");
+            showWarningAlert("Aministrasi Ditolak", "Pilih data pada tabel yang ingin diubah!");
             return;
         }
 
         try {
             String name = txtnamaMenu.getText().trim();
-            double price = Double.parseDouble(txthargaMenu.getText().trim());
+            double price = Double.parseDouble(txtHargaMenu.getText().trim());
             int idCategory = Integer.parseInt(txtidCategory.getText().trim());
+
+            // CONSTRAINT menu_harga_menu_ck memastikan nilai harga baru berada di atas nol (> 0)
+            if (price <= 0) {
+                showWarningAlert("Pelanggaran Constraint", "Harga menu harus lebih besar dari 0!");
+                return;
+            }
 
             String query = "UPDATE public.menu SET nama_menu = ?, harga_menu = ?, id_category = ? WHERE id_menu = ?";
 
@@ -145,7 +159,7 @@ public class MasterMenuController {
                 stmt.setString(1, name);
                 stmt.setDouble(2, price);
                 stmt.setInt(3, idCategory);
-                stmt.setInt(4, selected.getId());
+                stmt.setInt(4, selected.getIdMenu());
 
                 stmt.executeUpdate();
 
@@ -154,10 +168,11 @@ public class MasterMenuController {
                 showInformationAlert("Sukses", "Data menu berhasil diperbarui!");
 
             } catch (SQLException e) {
-                showErrorAlert("Database Error", "Gagal memperbarui data: " + e.getMessage());
+                // CONSTRAINT Mengunci validitas keunikan nama produk menu agar tidak terjadi bentrok duplikasi data
+                showErrorAlert("Database Error", "Gagal memperbarui data akibat constraint error: " + e.getMessage());
             }
         } catch (NumberFormatException e) {
-            showErrorAlert("Input Salah", "Harga dan ID Kategori harus berupa angka valid!");
+            showErrorAlert("Input Salah", "Nominal harga dan Category ID wajib menggunakan format data angka!");
         }
     }
 
@@ -175,7 +190,7 @@ public class MasterMenuController {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.setInt(1, selected.getId());
+            stmt.setInt(1, selected.getIdMenu());
             stmt.executeUpdate();
 
             loadDataDariDatabase();
@@ -183,6 +198,7 @@ public class MasterMenuController {
             showInformationAlert("Sukses", "Data menu berhasil dihapus!");
 
         } catch (SQLException e) {
+            // CONSTRAINT order_detail_id_menu_fk atau inventory_id_menu_fk memblokir proses hapus (Restrict) jika menu ini masih dipakai di transaksi
             showErrorAlert("Database Error", "Gagal menghapus data: " + e.getMessage());
         }
     }
@@ -191,25 +207,61 @@ public class MasterMenuController {
     @FXML
     public void onSearchBtnClick() {
         String kataKunci = txtCari.getText().toLowerCase().trim();
-        ObservableList<Menu> hasilFilter = FXCollections.observableArrayList();
+        daftarMenu.clear();
 
-        for (Menu menu : daftarMenu) {
-            if (menu.getName().toLowerCase().contains(kataKunci)) {
-                hasilFilter.add(menu);
+        // JOIN Menghubungkan tabel menu dengan tabel category produk untuk memfilter data pencarian secara relasional komprehensif
+        String query = "SELECT m.* FROM public.menu m JOIN public.category c ON m.id_category = c.id_category " +
+                "WHERE LOWER(m.nama_menu) LIKE ? OR LOWER(c.nama_category) LIKE ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, "%" + kataKunci + "%");
+            stmt.setString(2, "%" + kataKunci + "%");
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    daftarMenu.add(new Menu(
+                            rs.getInt("id_menu"),
+                            rs.getString("nama_menu"),
+                            rs.getDouble("harga_menu"),
+                            rs.getInt("id_category")
+                    ));
+                }
             }
+        } catch (SQLException e) {
+            showErrorAlert("Database Error", "Gagal memfilter pencarian data: " + e.getMessage());
         }
-        tabelMenu.setItems(hasilFilter);
+    }
+
+    // Menampilkan rangkuman performa statistik klasifikasi harga rata-rata menu kafe
+    @FXML
+    public void onShowStatisticClick() {
+        // AGGREGATION Menghitung nilai nilai total rata-rata harga produk menu menggunakan fungsi statistik AVG()
+        // SUBQUERRY klausa subquery bertingkat menyeleksi produk menu kafe yang nilai jualnya berada di atas rata-rata nasional kafe
+        String query = "SELECT COUNT(id_menu) FROM public.menu WHERE harga_menu > (SELECT AVG(harga_menu) FROM public.menu)";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            if (rs.next()) {
+                int jumlahMenuPremium = rs.getInt(1);
+                showInformationAlert("Rangkuman Agregasi", "Jumlah item menu premium (di atas harga rata-rata): " + jumlahMenuPremium + " produk.");
+            }
+        } catch (SQLException e) {
+            showErrorAlert("Database Error", "Gagal memproses perhitungan statistik agregasi menu: " + e.getMessage());
+        }
     }
 
     //RESET
     @FXML
     public void onResetBtnClick() {
         txtCari.clear();
-        tabelMenu.setItems(daftarMenu);
+        loadDataDariDatabase();
     }
 
     //BACK
-    @FXML
     public void goBack(ActionEvent event) throws IOException {
         stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         boolean isCurrentlyMaximized = stage.isMaximized();
@@ -227,7 +279,7 @@ public class MasterMenuController {
         txtidMenu.clear();
         txtidMenu.setDisable(false);
         txtnamaMenu.clear();
-        txthargaMenu.clear();
+        txtHargaMenu.clear();
         txtidCategory.clear();
         tabelMenu.getSelectionModel().clearSelection();
     }

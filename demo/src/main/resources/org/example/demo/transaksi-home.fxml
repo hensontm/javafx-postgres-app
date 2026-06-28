@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.TransaksiHomeController">
+
+    <center>
+        <VBox alignment="CENTER" spacing="15">
+
+            <Button fx:id="btn_inputTransaksi" onAction="#goInputTransaksi" prefHeight="45" prefWidth="250" text="Input Transaksi" />
+
+            <Button fx:id="btn_lihatTransaksi" onAction="#goLihatTransaksi" prefHeight="45" prefWidth="250" text="Kelola Transaksi" />
+
+        </VBox>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER_LEFT">
+            <padding>
+                <Insets bottom="25" left="25" />
+            </padding>
+
+            <Button fx:id="btn_back" onAction="#goBack" prefHeight="35" prefWidth="90" text="Back" />
+
+        </HBox>
+    </bottom>
+
+</BorderPane>

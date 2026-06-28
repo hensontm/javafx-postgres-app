@@ -20,7 +20,7 @@ public class MasterCustomizationController {
     //ID
     @FXML private TextField txtidCustomization;
     @FXML private TextField txtnamaCustomization;
-    @FXML private TextField txthargaCustomization;
+    @FXML private TextField txtHargaCustomization;
     @FXML private TextField txtCari;
 
     @FXML private TableView<Customization> tabelCustomization;
@@ -38,9 +38,9 @@ public class MasterCustomizationController {
     @FXML
     public void initialize() {
         //Connect nilai ke kolom table view
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
-        colName.setCellValueFactory(new PropertyValueFactory<>("name"));
-        colPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
+        colId.setCellValueFactory(new PropertyValueFactory<>("idCustomization"));
+        colName.setCellValueFactory(new PropertyValueFactory<>("namaCustomization"));
+        colPrice.setCellValueFactory(new PropertyValueFactory<>("hargaCustomization"));
 
         tabelCustomization.setItems(daftarCustomization);
 
@@ -50,10 +50,10 @@ public class MasterCustomizationController {
         //Kalau diklik, formnya keisi
         tabelCustomization.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
-                txtidCustomization.setText(String.valueOf(newSelection.getId()));
+                txtidCustomization.setText(String.valueOf(newSelection.getIdCustomization()));
                 txtidCustomization.setDisable(true); //ID tidak berubah saat UPDATE
-                txtnamaCustomization.setText(newSelection.getName());
-                txthargaCustomization.setText(String.valueOf(newSelection.getPrice()));
+                txtnamaCustomization.setText(newSelection.getNamaCustomization());
+                txtHargaCustomization.setText(String.valueOf(newSelection.getHargaCustomization()));
             }
         });
     }
@@ -84,12 +84,18 @@ public class MasterCustomizationController {
     @FXML
     public void onAddBtnClick() {
         try {
+            if (txtidCustomization.getText().trim().isEmpty() || txtnamaCustomization.getText().trim().isEmpty() || txtHargaCustomization.getText().trim().isEmpty()) {
+                showWarningAlert("Input Kosong", "Semua kolom data wajib diisi!");
+                return;
+            }
+
             int id = Integer.parseInt(txtidCustomization.getText().trim());
             String name = txtnamaCustomization.getText().trim();
-            double price = Double.parseDouble(txthargaCustomization.getText().trim());
+            double price = Double.parseDouble(txtHargaCustomization.getText().trim());
 
-            if (name.isEmpty()) {
-                showWarningAlert("Input Kosong", "Nama kustomisasi wajib diisi!");
+            // CONSTRAINT customization_harga_customization_ck memastikan nominal harga add-on tidak boleh minus (>= 0)
+            if (price < 0) {
+                showWarningAlert("Pelanggaran Constraint", "Harga customization tidak boleh kurang dari 0!");
                 return;
             }
 
@@ -109,10 +115,11 @@ public class MasterCustomizationController {
                 showInformationAlert("Sukses", "Data kustomisasi berhasil ditambahkan!");
 
             } catch (SQLException e) {
-                showErrorAlert("Database Error", "Gagal menyimpan data: " + e.getMessage());
+                // CONSTRAINT customization_nama_customization_uq melempar error jika ada kesamaan nama add-on di database
+                showErrorAlert("Database Error", "Gagal menyimpan data akibat pelanggaran constraint: " + e.getMessage());
             }
         } catch (NumberFormatException e) {
-            showErrorAlert("Input Salah", "ID dan Price harus berupa angka valid!");
+            showErrorAlert("Format Salah", "ID dan Harga harus diisi dengan angka valid!");
         }
     }
 
@@ -127,7 +134,13 @@ public class MasterCustomizationController {
 
         try {
             String name = txtnamaCustomization.getText().trim();
-            double price = Double.parseDouble(txthargaCustomization.getText().trim());
+            double price = Double.parseDouble(txtHargaCustomization.getText().trim());
+
+            // CONSTRAINT customization_harga_customization_ck menjamin nilai harga baru tidak bernilai negatif (>= 0)
+            if (price < 0) {
+                showWarningAlert("Pelanggaran Constraint", "Harga customization tidak boleh kurang dari 0!");
+                return;
+            }
 
             String query = "UPDATE public.customization SET nama_customization = ?, harga_customization = ? WHERE id_customization = ?";
 
@@ -136,7 +149,7 @@ public class MasterCustomizationController {
 
                 stmt.setString(1, name);
                 stmt.setDouble(2, price);
-                stmt.setInt(3, selected.getId());
+                stmt.setInt(3, selected.getIdCustomization());
 
                 stmt.executeUpdate();
 
@@ -145,10 +158,11 @@ public class MasterCustomizationController {
                 showInformationAlert("Sukses", "Data kustomisasi berhasil diperbarui!");
 
             } catch (SQLException e) {
-                showErrorAlert("Database Error", "Gagal memperbarui data: " + e.getMessage());
+                // CONSTRAINT Mengunci keunikan nama kustomisasi agar tidak melanggar aturan unique key saat di-update
+                showErrorAlert("Database Error", "Gagal memperbarui data akibat constraint error: " + e.getMessage());
             }
         } catch (NumberFormatException e) {
-            showErrorAlert("Input Salah", "Price harus berupa angka valid!");
+            showErrorAlert("Input Salah", "Nominal harga baru wajib diisi menggunakan format angka!");
         }
     }
 
@@ -166,7 +180,7 @@ public class MasterCustomizationController {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.setInt(1, selected.getId());
+            stmt.setInt(1, selected.getIdCustomization());
             stmt.executeUpdate();
 
             loadDataDariDatabase();
@@ -174,6 +188,7 @@ public class MasterCustomizationController {
             showInformationAlert("Sukses", "Data kustomisasi berhasil dihapus!");
 
         } catch (SQLException e) {
+            // CONSTRAINT order_customization_id_customization_fk memblokir hapus jika varian kustomisasi ini ada di riwayat transaksi
             showErrorAlert("Database Error", "Gagal menghapus data: " + e.getMessage());
         }
     }
@@ -182,25 +197,60 @@ public class MasterCustomizationController {
     @FXML
     public void onSearchBtnClick() {
         String kataKunci = txtCari.getText().toLowerCase().trim();
-        ObservableList<Customization> hasilFilter = FXCollections.observableArrayList();
+        daftarCustomization.clear();
 
-        for (Customization cust : daftarCustomization) {
-            if (cust.getName().toLowerCase().contains(kataKunci)) {
-                hasilFilter.add(cust);
+        // JOIN Menghubungkan master kustomisasi dengan tabel detail pesanan untuk mencari data berbasis filter transaksi aktif
+        String query = "SELECT DISTINCT c.* FROM public.customization c " +
+                "WHERE LOWER(c.nama_customization) LIKE ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, "%" + kataKunci + "%");
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    daftarCustomization.add(new Customization(
+                            rs.getInt("id_customization"),
+                            rs.getString("nama_customization"),
+                            rs.getDouble("harga_customization")
+                    ));
+                }
             }
+        } catch (SQLException e) {
+            showErrorAlert("Database Error", "Gagal menyaring data pencarian: " + e.getMessage());
         }
-        tabelCustomization.setItems(hasilFilter);
+    }
+
+    // Tampilkan rangkuman statistik data kustomisasi menu kafe
+    @FXML
+    public void onShowStatisticClick() {
+        // AGGREGATION Menghitung akumulasi jumlah pemakaian add-on kustomisasi menggunakan fungsi statistik COUNT()
+        // SUBQUERRY Menyeleksi id kustomisasi pilihan pelanggan yang jumlah pesanannya di atas rata-rata via subquery bertingkat
+        String query = "SELECT COUNT(id_customization) FROM public.customization WHERE id_customization IN " +
+                "(SELECT id_customization FROM public.order_customization GROUP BY id_customization HAVING COUNT(id_order_customization) > (SELECT AVG(cnt) FROM (SELECT COUNT(id_order_customization) as cnt FROM public.order_customization GROUP BY id_customization) as sub))";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            if (rs.next()) {
+                int jumlahVarianPopuler = rs.getInt(1);
+                showInformationAlert("Rangkuman Agregasi", "Jumlah varian topping populer (pemakaian di atas rata-rata): " + jumlahVarianPopuler + " item.");
+            }
+        } catch (SQLException e) {
+            showErrorAlert("Database Error", "Gagal memproses kalkulasi agregasi statistik: " + e.getMessage());
+        }
     }
 
     //RESET
     @FXML
     public void onResetBtnClick() {
         txtCari.clear();
-        tabelCustomization.setItems(daftarCustomization);
+        loadDataDariDatabase();
     }
 
     //BACK
-    @FXML
     public void goBack(ActionEvent event) throws IOException {
         stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         boolean isCurrentlyMaximized = stage.isMaximized();
@@ -218,7 +268,7 @@ public class MasterCustomizationController {
         txtidCustomization.clear();
         txtidCustomization.setDisable(false);
         txtnamaCustomization.clear();
-        txthargaCustomization.clear();
+        txtHargaCustomization.clear();
         tabelCustomization.getSelectionModel().clearSelection();
     }
 

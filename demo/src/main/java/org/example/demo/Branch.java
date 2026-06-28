@@ -2,34 +2,34 @@ package org.example.demo;
 
 public class Branch {
     //Attributes
-    private int id;
-    private String name;
-    private String address;
-    private String city;
-    private String postalCode;
+    private int idBranch;
+    private String namaBranch;
+    private String alamatBranch;
+    private String kotaBranch;
+    private String kodePosBranch;
 
     //Constructor
-    public Branch(int id, String name, String address, String city, String postalCode) {
-        this.id = id;
-        this.name = name;
-        this.address = address;
-        this.city = city;
-        this.postalCode = postalCode;
+    public Branch(int idBranch, String namaBranch, String alamatBranch, String kotaBranch, String kodePosBranch) {
+        this.idBranch = idBranch;
+        this.namaBranch = namaBranch;
+        this.alamatBranch = alamatBranch;
+        this.kotaBranch = kotaBranch;
+        this.kodePosBranch = kodePosBranch;
     }
 
     //GS
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public int getIdBranch() { return idBranch; }
+    public void setIdBranch(int idBranch) { this.idBranch = idBranch; }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public String getNamaBranch() { return namaBranch; }
+    public void setNamaBranch(String namaBranch) { this.namaBranch = namaBranch; }
 
-    public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
+    public String getAlamatBranch() { return alamatBranch; }
+    public void setAlamatBranch(String alamatBranch) { this.alamatBranch = alamatBranch; }
 
-    public String getCity() { return city; }
-    public void setCity(String city) { this.city = city; }
+    public String getKotaBranch() { return kotaBranch; }
+    public void setKotaBranch(String kotaBranch) { this.kotaBranch = kotaBranch; }
 
-    public String getPostalCode() { return postalCode; }
-    public void setPostalCode(String postalCode) { this.postalCode = postalCode; }
+    public String getKodePosBranch() { return kodePosBranch; }
+    public void setKodePosBranch(String kodePosBranch) { this.kodePosBranch = kodePosBranch; }
 }

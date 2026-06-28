@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="750.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.KelolaTransaksiController">
+
+    <top>
+        <VBox spacing="5.0">
+            <padding>
+                <Insets bottom="15.0" left="25.0" right="25.0" top="20.0" />
+            </padding>
+            <Label text="Transaction Management Dashboard">
+                <font>
+                    <Font name="System Bold" size="26.0" />
+                </font>
+            </Label>
+            <Label text="Lacak, cari, dan kelola status 30 data dummy transaksi pelanggan" textFill="#666666">
+                <font>
+                    <Font size="14.0" />
+                </font>
+            </Label>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="15.0">
+            <padding>
+                <Insets bottom="20.0" left="25.0" right="25.0" />
+            </padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <Label text="Cari Transaksi:">
+                    <font>
+                        <Font name="System Bold" size="13.0" />
+                    </font>
+                </Label>
+                <TextField fx:id="txtCari" promptText="Ketik nama customer / cabang..." prefWidth="300.0" />
+                <Button onAction="#onSearchBtnClick" text="🔍 Search" style="-fx-background-color: #2196F3; -fx-text-fill: white;" />
+                <Button onAction="#onResetBtnClick" text="🔄 Reset" />
+            </HBox>
+
+            <VBox spacing="5.0" VBox.vgrow="ALWAYS">
+                <Label text="📋 Daftar Master Transaksi (Klik baris untuk melihat rincian belanja)" textFill="#2c3e50">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                </Label>
+                <TableView fx:id="tabelMasterOrder" prefHeight="250.0" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colIdOrder" prefWidth="80.0" text="ID Order" />
+                        <TableColumn fx:id="colTanggal" prefWidth="110.0" text="Tanggal" />
+                        <TableColumn fx:id="colWaktu" prefWidth="90.0" text="Waktu" />
+                        <TableColumn fx:id="colCustomer" prefWidth="200.0" text="Nama Customer" />
+                        <TableColumn fx:id="colBranch" prefWidth="180.0" text="Cabang Restoran" />
+                        <TableColumn fx:id="colTotalBayar" prefWidth="140.0" text="Total Bayar (Rp)" />
+                        <TableColumn fx:id="colStatus" prefWidth="120.0" text="Status Order" />
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="15.0" style="-fx-background-color: #f8f9fa; -fx-padding: 10; -fx-background-radius: 5;">
+                <Label text="Aksi Nota Terpilih:">
+                    <font>
+                        <Font name="System Bold" size="13.0" />
+                    </font>
+                </Label>
+                <ComboBox fx:id="comboStatusUpdate" promptText="Pilih Status Baru" prefWidth="150.0" />
+                <Button onAction="#onUpdateStatusBtnClick" text="Update Status" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;" />
+                <Button onAction="#onShowStatisticClick" text="📊 Tampilkan Statistik Gaji/Nota" style="-fx-background-color: #9C27B0; -fx-text-fill: white;" />
+                <HBox HBox.hgrow="ALWAYS" alignment="CENTER_RIGHT">
+                    <Button onAction="#onDeleteTransaksiBtnClick" text="🗑️ Hapus Transaksi" style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-weight: bold;" />
+                </HBox>
+            </HBox>
+
+            <VBox spacing="5.0" VBox.vgrow="ALWAYS">
+                <Label text="🛒 Rincian Item Menu &amp; Kustomisasi" textFill="#2c3e50">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                </Label>
+                <TableView fx:id="tabelDetailOrder" prefHeight="180.0" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colNamaMenu" prefWidth="250.0" text="Nama Menu Makanan/Minuman" />
+                        <TableColumn fx:id="colJumlah" prefWidth="100.0" text="Jumlah Beli" />
+                        <TableColumn fx:id="colKustomisasi" prefWidth="550.0" text="Pilihan Kustomisasi (Add-on Topping)" />
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <HBox alignment="CENTER_LEFT">
+                <Button onAction="#goBack" text="&lt;-- Back" prefWidth="120.0" style="-fx-font-size: 13;" />
+            </HBox>
+
+        </VBox>
+    </center>
+</BorderPane>

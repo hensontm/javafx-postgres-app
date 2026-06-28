@@ -26,7 +26,7 @@ public class MasterInventoryController {
 
     @FXML private TableView<Inventory> tabelInventory;
     @FXML private TableColumn<Inventory, Integer> colId;
-    @FXML private TableColumn<Inventory, Integer> colStok;
+    @FXML private TableColumn<Inventory, Integer> colStock;
     @FXML private TableColumn<Inventory, Integer> colIdMenu;
     @FXML private TableColumn<Inventory, Integer> colIdBranch;
 
@@ -40,8 +40,8 @@ public class MasterInventoryController {
     @FXML
     public void initialize() {
         //Connect nilai ke kolom table view
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
-        colStok.setCellValueFactory(new PropertyValueFactory<>("stok"));
+        colId.setCellValueFactory(new PropertyValueFactory<>("idInventory"));
+        colStock.setCellValueFactory(new PropertyValueFactory<>("stokInventory"));
         colIdMenu.setCellValueFactory(new PropertyValueFactory<>("idMenu"));
         colIdBranch.setCellValueFactory(new PropertyValueFactory<>("idBranch"));
 
@@ -53,9 +53,9 @@ public class MasterInventoryController {
         //Kalau diklik, formnya keisi
         tabelInventory.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
-                txtidInventory.setText(String.valueOf(newSelection.getId()));
+                txtidInventory.setText(String.valueOf(newSelection.getIdInventory()));
                 txtidInventory.setDisable(true); //ID tidak berubah saat UPDATE
-                txtStok.setText(String.valueOf(newSelection.getStok()));
+                txtStok.setText(String.valueOf(newSelection.getStokInventory()));
                 txtidMenu.setText(String.valueOf(newSelection.getIdMenu()));
                 txtidBranch.setText(String.valueOf(newSelection.getIdBranch()));
             }
@@ -89,10 +89,22 @@ public class MasterInventoryController {
     @FXML
     public void onAddBtnClick() {
         try {
+            if (txtidInventory.getText().trim().isEmpty() || txtStok.getText().trim().isEmpty() ||
+                    txtidMenu.getText().trim().isEmpty() || txtidBranch.getText().trim().isEmpty()) {
+                showWarningAlert("Input Kosong", "Semua kolom data wajib diisi!");
+                return;
+            }
+
             int id = Integer.parseInt(txtidInventory.getText().trim());
-            int stok = Integer.parseInt(txtStok.getText().trim());
+            int stock = Integer.parseInt(txtStok.getText().trim());
             int idMenu = Integer.parseInt(txtidMenu.getText().trim());
             int idBranch = Integer.parseInt(txtidBranch.getText().trim());
+
+            // CONSTRAINT inventory_stok_inventory_ck nilai stok gudang tidak boleh bernilai kurang dari nol (>= 0)
+            if (stock < 0) {
+                showWarningAlert("Pelanggaran Constraint", "Stok barang tidak boleh negatif!");
+                return;
+            }
 
             String query = "INSERT INTO public.inventory (id_inventory, stok_inventory, id_menu, id_branch) VALUES (?, ?, ?, ?)";
 
@@ -100,7 +112,7 @@ public class MasterInventoryController {
                  PreparedStatement stmt = conn.prepareStatement(query)) {
 
                 stmt.setInt(1, id);
-                stmt.setInt(2, stok);
+                stmt.setInt(2, stock);
                 stmt.setInt(3, idMenu);
                 stmt.setInt(4, idBranch);
 
@@ -108,13 +120,14 @@ public class MasterInventoryController {
 
                 loadDataDariDatabase();
                 clearForm();
-                showInformationAlert("Sukses", "Data inventori berhasil ditambahkan!");
+                showInformationAlert("Sukses", "Data inventory berhasil ditambahkan!");
 
             } catch (SQLException e) {
-                showErrorAlert("Database Error", "Gagal menyimpan data: " + e.getMessage());
+                // CONSTRAINT inventory_id_menu_id_branch_uq validasi kombinasi menu-cabang unik dan foreign key integrity
+                showErrorAlert("Database Error", "Gagal menyimpan data akibat pelanggaran constraint: " + e.getMessage());
             }
         } catch (NumberFormatException e) {
-            showErrorAlert("Input Salah", "Semua kolom input harus berupa angka valid!");
+            showErrorAlert("Format Salah", "Semua inputan wajib diisi dengan angka bulat!");
         }
     }
 
@@ -128,31 +141,38 @@ public class MasterInventoryController {
         }
 
         try {
-            int stok = Integer.parseInt(txtStok.getText().trim());
+            int stock = Integer.parseInt(txtStok.getText().trim());
             int idMenu = Integer.parseInt(txtidMenu.getText().trim());
             int idBranch = Integer.parseInt(txtidBranch.getText().trim());
+
+            // CONSTRAINT inventory_stok_inventory_ck memastikan pembaruan nilai jumlah stok baru tidak minus (>= 0)
+            if (stock < 0) {
+                showWarningAlert("Pelanggaran Constraint", "Stok barang tidak boleh negatif!");
+                return;
+            }
 
             String query = "UPDATE public.inventory SET stok_inventory = ?, id_menu = ?, id_branch = ? WHERE id_inventory = ?";
 
             try (Connection conn = DatabaseConnection.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(query)) {
 
-                stmt.setInt(1, stok);
+                stmt.setInt(1, stock);
                 stmt.setInt(2, idMenu);
                 stmt.setInt(3, idBranch);
-                stmt.setInt(4, selected.getId());
+                stmt.setInt(4, selected.getIdInventory());
 
                 stmt.executeUpdate();
 
                 loadDataDariDatabase();
                 clearForm();
-                showInformationAlert("Sukses", "Data inventori berhasil diperbarui!");
+                showInformationAlert("Sukses", "Data inventory berhasil diperbarui!");
 
             } catch (SQLException e) {
-                showErrorAlert("Database Error", "Gagal memperbarui data: " + e.getMessage());
+                // CONSTRAINT Memastikan kombinasi menu dan cabang tidak duplikat melanggar aturan unique key database
+                showErrorAlert("Database Error", "Gagal memperbarui data akibat constraint error: " + e.getMessage());
             }
         } catch (NumberFormatException e) {
-            showErrorAlert("Input Salah", "Semua kolom input harus berupa angka valid!");
+            showErrorAlert("Input Salah", "Input data stok, menu ID, dan branch ID wajib berupa angka!");
         }
     }
 
@@ -170,12 +190,12 @@ public class MasterInventoryController {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.setInt(1, selected.getId());
+            stmt.setInt(1, selected.getIdInventory());
             stmt.executeUpdate();
 
             loadDataDariDatabase();
             clearForm();
-            showInformationAlert("Sukses", "Data inventori berhasil dihapus!");
+            showInformationAlert("Sukses", "Data inventory berhasil dihapus!");
 
         } catch (SQLException e) {
             showErrorAlert("Database Error", "Gagal menghapus data: " + e.getMessage());
@@ -185,31 +205,64 @@ public class MasterInventoryController {
     //SEARCH
     @FXML
     public void onSearchBtnClick() {
-        String kataKunci = txtCari.getText().trim();
-        if (kataKunci.isEmpty()) {
-            tabelInventory.setItems(daftarInventory);
-            return;
-        }
+        String kataKunci = txtCari.getText().toLowerCase().trim();
+        daftarInventory.clear();
 
-        ObservableList<Inventory> hasilFilter = FXCollections.observableArrayList();
-        for (Inventory inv : daftarInventory) {
-            if (String.valueOf(inv.getIdBranch()).equals(kataKunci) ||
-                    String.valueOf(inv.getIdMenu()).equals(kataKunci)) {
-                hasilFilter.add(inv);
+        // JOIN Menghubungkan tabel inventory dengan tabel menu dan branch untuk pencarian silang berbasis nama menu atau nama cabang
+        String query = "SELECT i.* FROM public.inventory i " +
+                "JOIN public.menu m ON i.id_menu = m.id_menu " +
+                "JOIN public.branch b ON i.id_branch = b.id_branch " +
+                "WHERE LOWER(m.nama_menu) LIKE ? OR LOWER(b.nama_branch) LIKE ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, "%" + kataKunci + "%");
+            stmt.setString(2, "%" + kataKunci + "%");
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    daftarInventory.add(new Inventory(
+                            rs.getInt("id_inventory"),
+                            rs.getInt("stok_inventory"),
+                            rs.getInt("id_menu"),
+                            rs.getInt("id_branch")
+                    ));
+                }
             }
+        } catch (SQLException e) {
+            showErrorAlert("Database Error", "Gagal melakukan penyaringan pencarian data: " + e.getMessage());
         }
-        tabelInventory.setItems(hasilFilter);
+    }
+
+    // Menampilkan rangkuman total stok yang berada di atas rata-rata kapasitas gudang nasional
+    @FXML
+    public void onShowStatisticClick() {
+        // AGGREGATION Menghitung nilai total stok gudang menggunakan kombinasi fungsi statistika SUM()
+        // SUBQUERRY Menyeleksi data stok cabang yang nilainya berada di atas ambang batas rata-rata internal via nested subquery
+        String query = "SELECT SUM(stok_inventory) FROM public.inventory WHERE stok_inventory > (SELECT AVG(stok_inventory) FROM public.inventory)";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            if (rs.next()) {
+                int totalStokHebat = rs.getInt(1);
+                showInformationAlert("Rangkuman Agregasi", "Total stok barang melimpah (di atas rata-rata): " + totalStokHebat + " item.");
+            }
+        } catch (SQLException e) {
+            showErrorAlert("Database Error", "Gagal memproses pengolahan data statistik agregasi: " + e.getMessage());
+        }
     }
 
     //RESET
     @FXML
     public void onResetBtnClick() {
         txtCari.clear();
-        tabelInventory.setItems(daftarInventory);
+        loadDataDariDatabase();
     }
 
     //BACK
-    @FXML
     public void goBack(ActionEvent event) throws IOException {
         stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         boolean isCurrentlyMaximized = stage.isMaximized();

@@ -2,28 +2,28 @@ package org.example.demo;
 
 public class Menu {
     //Attributes
-    private int id;
-    private String name;
-    private double price;
+    private int idMenu;
+    private String namaMenu;
+    private double hargaMenu;
     private int idCategory;
 
     //Constructor
-    public Menu(int id, String name, double price, int idCategory) {
-        this.id = id;
-        this.name = name;
-        this.price = price;
+    public Menu(int idMenu, String namaMenu, double hargaMenu, int idCategory) {
+        this.idMenu = idMenu;
+        this.namaMenu = namaMenu;
+        this.hargaMenu = hargaMenu;
         this.idCategory = idCategory;
     }
 
     //GS
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public int getIdMenu() { return idMenu; }
+    public void setIdMenu(int idMenu) { this.idMenu = idMenu; }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public String getNamaMenu() { return namaMenu; }
+    public void setNamaMenu(String namaMenu) { this.namaMenu = namaMenu; }
 
-    public double getPrice() { return price; }
-    public void setPrice(double price) { this.price = price; }
+    public double getHargaMenu() { return hargaMenu; }
+    public void setHargaMenu(double hargaMenu) { this.hargaMenu = hargaMenu; }
 
     public int getIdCategory() { return idCategory; }
     public void setIdCategory(int idCategory) { this.idCategory = idCategory; }

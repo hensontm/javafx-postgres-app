@@ -2,24 +2,24 @@ package org.example.demo;
 
 public class Customization {
     //Attributes
-    private int id;
-    private String name;
-    private double price;
+    private int idCustomization;
+    private String namaCustomization;
+    private double hargaCustomization;
 
     //Constructor
-    public Customization(int id, String name, double price) {
-        this.id = id;
-        this.name = name;
-        this.price = price;
+    public Customization(int idCustomization, String namaCustomization, double hargaCustomization) {
+        this.idCustomization = idCustomization;
+        this.namaCustomization = namaCustomization;
+        this.hargaCustomization = hargaCustomization;
     }
 
     //GS
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public int getIdCustomization() { return idCustomization; }
+    public void setIdCustomization(int idCustomization) { this.idCustomization = idCustomization; }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public String getNamaCustomization() { return namaCustomization; }
+    public void setNamaCustomization(String namaCustomization) { this.namaCustomization = namaCustomization; }
 
-    public double getPrice() { return price; }
-    public void setPrice(double price) { this.price = price; }
+    public double getHargaCustomization() { return hargaCustomization; }
+    public void setHargaCustomization(double hargaCustomization) { this.hargaCustomization = hargaCustomization; }
 }
