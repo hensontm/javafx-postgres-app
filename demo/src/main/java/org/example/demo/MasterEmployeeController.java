@@ -22,6 +22,10 @@ public class MasterEmployeeController {
     @FXML private TextField txtnamaEmployee;
     @FXML private ComboBox<String> comboPosition;
     @FXML private TextField txtSalary;
+    @FXML private TextField txtTanggalLahir;
+    @FXML private TextField txtAlamat;
+    @FXML private TextField txtidBranch;
+    @FXML private TextField txtTelp;
     @FXML private TextField txtCari;
 
     @FXML private TableView<Employee> tabelEmployee;
@@ -29,6 +33,10 @@ public class MasterEmployeeController {
     @FXML private TableColumn<Employee, String> colName;
     @FXML private TableColumn<Employee, String> colPosition;
     @FXML private TableColumn<Employee, Double> colSalary;
+    @FXML private TableColumn<Employee, Date> colBirthDate;
+    @FXML private TableColumn<Employee, String> colAddress;
+    @FXML private TableColumn<Employee, Integer> colIdBranch;
+    @FXML private TableColumn<Employee, String> colPhone;
 
     private Parent root;
     private Stage stage;
@@ -44,11 +52,15 @@ public class MasterEmployeeController {
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colPosition.setCellValueFactory(new PropertyValueFactory<>("position"));
         colSalary.setCellValueFactory(new PropertyValueFactory<>("salary"));
+        colBirthDate.setCellValueFactory(new PropertyValueFactory<>("birthDate"));
+        colAddress.setCellValueFactory(new PropertyValueFactory<>("address"));
+        colIdBranch.setCellValueFactory(new PropertyValueFactory<>("idBranch"));
+        colPhone.setCellValueFactory(new PropertyValueFactory<>("phone"));
 
         tabelEmployee.setItems(daftarEmployee);
 
         //Isi combobox
-        comboPosition.getItems().addAll("Manager", "Staff", "Supervisor", "Developer");
+        comboPosition.getItems().addAll("Manager", "Staff", "Supervisor", "Developer", "Barista");
 
         //Load data PosgreSQL
         loadDataDariDatabase();
@@ -61,6 +73,10 @@ public class MasterEmployeeController {
                 txtnamaEmployee.setText(newSelection.getName());
                 comboPosition.setValue(newSelection.getPosition());
                 txtSalary.setText(String.valueOf(newSelection.getSalary()));
+                txtTanggalLahir.setText(String.valueOf(newSelection.getBirthDate()));
+                txtAlamat.setText(newSelection.getAddress());
+                txtidBranch.setText(String.valueOf(newSelection.getIdBranch()));
+                txtTelp.setText(newSelection.getPhone());
             }
         });
     }
@@ -68,7 +84,7 @@ public class MasterEmployeeController {
     //Narik data PosgreSQL
     private void loadDataDariDatabase() {
         daftarEmployee.clear();
-        String query = "SELECT id_employee, nama_employee, jabatan_employee, gaji_employee FROM public.employee ORDER BY id_employee ASC";
+        String query = "SELECT id_employee, nama_employee, jabatan_employee, gaji_employee, tanggal_lahir_employee, alamat_employee, id_branch, telp_employee FROM public.employee ORDER BY id_employee ASC";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query);
@@ -79,7 +95,11 @@ public class MasterEmployeeController {
                         rs.getInt("id_employee"),
                         rs.getString("nama_employee"),
                         rs.getString("jabatan_employee"),
-                        rs.getDouble("gaji_employee")
+                        rs.getDouble("gaji_employee"),
+                        rs.getDate("tanggal_lahir_employee"),
+                        rs.getString("alamat_employee"),
+                        rs.getInt("id_branch"),
+                        rs.getString("telp_employee")
                 );
                 daftarEmployee.add(emp);
             }
@@ -96,9 +116,13 @@ public class MasterEmployeeController {
             String name = txtnamaEmployee.getText().trim();
             String position = comboPosition.getValue();
             double salary = Double.parseDouble(txtSalary.getText().trim());
+            Date birthDate = Date.valueOf(txtTanggalLahir.getText().trim());
+            String address = txtAlamat.getText().trim();
+            int idBranch = Integer.parseInt(txtidBranch.getText().trim());
+            String phone = txtTelp.getText().trim();
 
-            if (name.isEmpty() || position == null) {
-                showWarningAlert("Input Kosong", "Nama dan Posisi wajib diisi!");
+            if (name.isEmpty() || position == null || address.isEmpty() || phone.isEmpty()) {
+                showWarningAlert("Input Kosong", "Semua kolom data wajib diisi!");
                 return;
             }
 
@@ -111,12 +135,10 @@ public class MasterEmployeeController {
                 stmt.setString(2, name);
                 stmt.setString(3, position);
                 stmt.setDouble(4, salary);
-
-                // Nilai default untuk kolom opsional di pgAdmin agar tidak null constraint error
-                stmt.setDate(5, Date.valueOf("2000-01-01"));
-                stmt.setString(6, "Surabaya");
-                stmt.setInt(7, 1);
-                stmt.setString(8, "0812345678");
+                stmt.setDate(5, birthDate);
+                stmt.setString(6, address);
+                stmt.setInt(7, idBranch);
+                stmt.setString(8, phone);
 
                 stmt.executeUpdate();
 
@@ -127,8 +149,8 @@ public class MasterEmployeeController {
             } catch (SQLException e) {
                 showErrorAlert("Database Error", "Gagal menyimpan data: " + e.getMessage());
             }
-        } catch (NumberFormatException e) {
-            showErrorAlert("Input Salah", "ID dan Salary harus berupa angka valid!");
+        } catch (IllegalArgumentException e) {
+            showErrorAlert("Format Salah", "Format Tanggal Lahir harus YYYY-MM-DD!");
         }
     }
 
@@ -145,8 +167,12 @@ public class MasterEmployeeController {
             String name = txtnamaEmployee.getText().trim();
             String position = comboPosition.getValue();
             double salary = Double.parseDouble(txtSalary.getText().trim());
+            Date birthDate = Date.valueOf(txtTanggalLahir.getText().trim());
+            String address = txtAlamat.getText().trim();
+            int idBranch = Integer.parseInt(txtidBranch.getText().trim());
+            String phone = txtTelp.getText().trim();
 
-            String query = "UPDATE public.employee SET nama_employee = ?, jabatan_employee = ?, gaji_employee = ? WHERE id_employee = ?";
+            String query = "UPDATE public.employee SET nama_employee = ?, jabatan_employee = ?, gaji_employee = ?, tanggal_lahir_employee = ?, alamat_employee = ?, id_branch = ?, telp_employee = ? WHERE id_employee = ?";
 
             try (Connection conn = DatabaseConnection.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -154,7 +180,11 @@ public class MasterEmployeeController {
                 stmt.setString(1, name);
                 stmt.setString(2, position);
                 stmt.setDouble(3, salary);
-                stmt.setInt(4, selected.getId());
+                stmt.setDate(4, birthDate);
+                stmt.setString(5, address);
+                stmt.setInt(6, idBranch);
+                stmt.setString(7, phone);
+                stmt.setInt(8, selected.getId());
 
                 stmt.executeUpdate();
 
@@ -165,8 +195,8 @@ public class MasterEmployeeController {
             } catch (SQLException e) {
                 showErrorAlert("Database Error", "Gagal memperbarui data: " + e.getMessage());
             }
-        } catch (NumberFormatException e) {
-            showErrorAlert("Input Salah", "Gaji (Salary) harus berupa angka valid!");
+        } catch (IllegalArgumentException e) {
+            showErrorAlert("Input Salah", "Gaji/Branch ID harus angka dan format Tanggal Lahir harus YYYY-MM-DD!");
         }
     }
 
@@ -204,7 +234,8 @@ public class MasterEmployeeController {
 
         for (Employee emp : daftarEmployee) {
             if (emp.getName().toLowerCase().contains(kataKunci) ||
-                    emp.getPosition().toLowerCase().contains(kataKunci)) {
+                    emp.getPosition().toLowerCase().contains(kataKunci) ||
+                    emp.getAddress().toLowerCase().contains(kataKunci)) {
                 hasilFilter.add(emp);
             }
         }
@@ -219,7 +250,6 @@ public class MasterEmployeeController {
     }
 
     //BACK
-    @FXML
     public void goBack(ActionEvent event) throws IOException {
         stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         boolean isCurrentlyMaximized = stage.isMaximized();
@@ -239,6 +269,10 @@ public class MasterEmployeeController {
         txtnamaEmployee.clear();
         comboPosition.setValue(null);
         txtSalary.clear();
+        txtTanggalLahir.clear();
+        txtAlamat.clear();
+        txtidBranch.clear();
+        txtTelp.clear();
         tabelEmployee.getSelectionModel().clearSelection();
     }
 
