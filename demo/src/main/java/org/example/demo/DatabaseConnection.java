@@ -8,7 +8,7 @@ public class DatabaseConnection {
     // Variabel ini sudah menggunakan data database Anda
     private static final String URL = "jdbc:postgresql://localhost:5432/Project_BD";
     private static final String USER = "postgres";
-    private static final String PASSWORD = "752413";
+    private static final String PASSWORD = "12345678";
 
     public static Connection getConnection() {
         Connection connection = null;

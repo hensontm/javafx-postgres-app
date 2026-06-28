@@ -406,7 +406,7 @@ public class TransaksiController {
     public void goBack(ActionEvent event) throws IOException {
         stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         boolean isCurrentlyMaximized = stage.isMaximized();
-        root = FXMLLoader.load(getClass().getResource("transaksi-home-view.fxml"));
+        root = FXMLLoader.load(getClass().getResource("/org/example/demo/transaksi-home-view.fxml"));
         scene = new Scene(root);
         stage.setScene(scene);
         stage.setMaximized(isCurrentlyMaximized);
