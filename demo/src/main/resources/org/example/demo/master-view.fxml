@@ -1,25 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ButtonBar?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.MasterController">
-   <children>
-      <VBox alignment="CENTER" layoutX="222.0" layoutY="84.0" spacing="10.0" AnchorPane.bottomAnchor="116.0" AnchorPane.leftAnchor="222.0" AnchorPane.rightAnchor="222.0" AnchorPane.topAnchor="84.0">
-         <children>
-            <Button fx:id="btn_employee" mnemonicParsing="false" onAction="#goEmployee" prefHeight="25.0" prefWidth="156.0" text="Employee" />
-            <Button fx:id="btn_branch" mnemonicParsing="false" onAction="#goBranch" prefHeight="25.0" prefWidth="156.0" text="Branch" />
-            <Button fx:id="btn_inventory" mnemonicParsing="false" onAction="#goInventory" prefHeight="25.0" prefWidth="156.0" text="Inventory" />
-            <Button fx:id="btn_customer" mnemonicParsing="false" onAction="#goCustomer" prefHeight="25.0" prefWidth="156.0" text="Customer" />
-            <Button fx:id="btn_payment" mnemonicParsing="false" onAction="#goPayment" prefHeight="25.0" prefWidth="156.0" text="Payment" />
-            <Button fx:id="btn_customization" mnemonicParsing="false" onAction="#goCustomization" prefHeight="25.0" prefWidth="156.0" text="Customization" />
-            <Button fx:id="btn_menu" mnemonicParsing="false" onAction="#goMenu" prefHeight="25.0" prefWidth="156.0" text="Menu" />
-            <Button fx:id="btn_category" mnemonicParsing="false" onAction="#goCategory" prefHeight="25.0" prefWidth="156.0" text="Category" />
-         </children>
+<BorderPane prefWidth="1280.0" prefHeight="720.0"
+            xmlns="http://javafx.com/javafx/25"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.demo.MasterController">
+
+   <center>
+      <VBox alignment="CENTER" spacing="15">
+
+         <Button fx:id="btn_employee"
+                 text="Employee"
+                 prefWidth="250"
+                 prefHeight="45"
+                 onAction="#goEmployee"/>
+
+         <Button fx:id="btn_branch"
+                 text="Branch"
+                 prefWidth="250"
+                 prefHeight="45"
+                 onAction="#goBranch"/>
+
+         <Button fx:id="btn_inventory"
+                 text="Inventory"
+                 prefWidth="250"
+                 prefHeight="45"
+                 onAction="#goInventory"/>
+
+         <Button fx:id="btn_customer"
+                 text="Customer"
+                 prefWidth="250"
+                 prefHeight="45"
+                 onAction="#goCustomer"/>
+
+         <Button fx:id="btn_payment"
+                 text="Payment"
+                 prefWidth="250"
+                 prefHeight="45"
+                 onAction="#goPayment"/>
+
+         <Button fx:id="btn_customization"
+                 text="Customization"
+                 prefWidth="250"
+                 prefHeight="45"
+                 onAction="#goCustomization"/>
+
+         <Button fx:id="btn_menu"
+                 text="Menu"
+                 prefWidth="250"
+                 prefHeight="45"
+                 onAction="#goMenu"/>
+
+         <Button fx:id="btn_category"
+                 text="Category"
+                 prefWidth="250"
+                 prefHeight="45"
+                 onAction="#goCategory"/>
+
       </VBox>
-      <ButtonBar prefHeight="40.0" prefWidth="200.0" />
-      <Button fx:id="btn_back" layoutX="35.0" layoutY="345.0" mnemonicParsing="false" onAction="#goBack" prefHeight="25.0" prefWidth="58.0" text="Back" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="35.0" />
-   </children>
-</AnchorPane>
+   </center>
+
+   <bottom>
+      <HBox alignment="CENTER_LEFT">
+         <padding>
+            <Insets left="25" bottom="25"/>
+         </padding>
+
+         <Button fx:id="btn_back"
+                 text="Back"
+                 prefWidth="90"
+                 prefHeight="35"
+                 onAction="#goBack"/>
+
+      </HBox>
+   </bottom>
+
+</BorderPane>

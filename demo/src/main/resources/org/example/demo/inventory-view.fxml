@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="720" prefWidth="1280" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.MasterInventoryController">
+<BorderPane prefHeight="720" prefWidth="1280" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.MasterInventoryController">
 
     <left>
         <VBox prefWidth="320" spacing="15" style="-fx-background-color:#F4F4F4;">
@@ -70,10 +70,10 @@
 
             <TableView fx:id="tabelInventory" VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn fx:id="colId" prefWidth="100" text="ID" />
-                    <TableColumn fx:id="colStok" prefWidth="150" text="Stock" />
-                    <TableColumn fx:id="colIdMenu" prefWidth="150" text="Menu ID" />
-                    <TableColumn fx:id="colIdBranch" prefWidth="150" text="Branch ID" />
+                    <TableColumn fx:id="colId" prefWidth="204.5" text="ID" />
+                    <TableColumn fx:id="colStok" prefWidth="236.0" text="Stock" />
+                    <TableColumn fx:id="colIdMenu" prefWidth="222.0" text="Menu ID" />
+                    <TableColumn fx:id="colIdBranch" prefWidth="256.5" text="Branch ID" />
                 </columns>
             </TableView>
         </VBox>
