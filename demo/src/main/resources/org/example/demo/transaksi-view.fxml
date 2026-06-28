@@ -2,44 +2,117 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane
+<BorderPane prefHeight="720" prefWidth="1280" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.TransaksiController">
 
-        prefWidth="1280"
-        prefHeight="720"
-        xmlns="http://javafx.com/javafx/21"
-        xmlns:fx="http://javafx.com/fxml/1"
-        fx:controller="org.example.demo.TransaksiController">
-
-    <top>
-
-        <HBox>
-
+    <left>
+        <VBox spacing="10" prefWidth="460" style="-fx-background-color: #F8F9F9; -fx-border-color: #E5E7E9; -fx-border-width: 0 1 0 0;">
             <padding>
-                <Insets top="15" left="15"/>
+                <Insets bottom="15" left="20" right="20" top="15" />
             </padding>
 
-            <Button text="← Back"
-                    onAction="#goBack"/>
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <Button onAction="#goBack" style="-fx-background-color: #808B96; -fx-text-fill: white;" text="← Back" />
+                <Label text="Form Transaksi POS">
+                    <font>
+                        <Font name="System Bold" size="20" />
+                    </font>
+                </Label>
+            </HBox>
 
-        </HBox>
+            <VBox spacing="6" style="-fx-background-color: #EBEDEF; -fx-padding: 12; -fx-background-radius: 6;">
+                <Label text="Customer Name" style="-fx-font-weight: bold;" />
+                <TextField fx:id="txtNamaCust" promptText="Ketik nama pembeli (Auto-Reg)" />
 
-    </top>
+                <Label text="Customer Phone" style="-fx-font-weight: bold;" />
+                <TextField fx:id="txtTelpCust" promptText="Ketik nomor telepon" />
+
+                <Label text="Branch Location" style="-fx-font-weight: bold;" />
+                <ComboBox fx:id="comboBranch" promptText="-- Pilih Cabang Toko --" maxWidth="Infinity" />
+
+                <Label text="Active Cashier (Employee)" style="-fx-font-weight: bold;" />
+                <ComboBox fx:id="comboEmployee" promptText="-- Pilih Karyawan Bertugas --" maxWidth="Infinity" />
+
+                <Label text="Payment Method" style="-fx-font-weight: bold;" />
+                <ComboBox fx:id="comboPayment" promptText="-- Pilih Metode Pembayaran --" maxWidth="Infinity" />
+
+                <Label text="Discount Restoran (Rp)" style="-fx-font-weight: bold;" />
+                <TextField fx:id="txtDiskon" promptText="0" text="0" />
+            </VBox>
+
+            <Label text="1. Pilih Menu" style="-fx-font-weight: bold; -fx-font-size: 14;" />
+            <HBox spacing="10">
+                <ComboBox fx:id="comboMenu" promptText="-- Pilih Menu --" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+                <TextField fx:id="txtQtyMenu" prefWidth="65" promptText="Qty" />
+            </HBox>
+
+            <Label text="2. Tambah Kustomisasi (Optional)" style="-fx-font-weight: bold; -fx-font-size: 14;" />
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <ComboBox fx:id="comboCustomization" promptText="-- Pilih Add-On --" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+                <TextField fx:id="txtQtyCustom" prefWidth="65" promptText="Qty" />
+                <Button onAction="#onTambahKustomisasiClick" style="-fx-background-color: #34495E; -fx-text-fill: white;" text="Apply" />
+            </HBox>
+
+            <TableView fx:id="tabelKustomisasiSementara" prefHeight="130">
+                <columns>
+                    <TableColumn fx:id="colCustNameTemp" prefWidth="180" text="Customization" />
+                    <TableColumn fx:id="colCustQtyTemp" prefWidth="70" text="Qty" />
+                    <TableColumn fx:id="colCustPriceTemp" prefWidth="150" text="Subtotal" />
+                </columns>
+            </TableView>
+
+            <Button onAction="#onTambahKeKeranjangClick" maxWidth="Infinity" prefHeight="38" style="-fx-background-color: #27AE60; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13;" text="➕ TAMBAH KE KERANJANG UTAMA" />
+        </VBox>
+    </left>
 
     <center>
+        <VBox spacing="15">
+            <padding>
+                <Insets bottom="20" left="20" right="20" top="15" />
+            </padding>
 
-        <Label text="HALAMAN TRANSAKSI">
+            <Label text="Keranjang Belanja Sementara (Nota Aktif)">
+                <font>
+                    <Font name="System Bold" size="22" />
+                </font>
+            </Label>
 
-            <font>
-                <Font size="30"/>
-            </font>
+            <TableView fx:id="tabelKeranjangUtama" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colMenuNameCart" prefWidth="180" text="Item Menu" />
+                    <TableColumn fx:id="colMenuQtyCart" prefWidth="70" text="Qty" />
+                    <TableColumn fx:id="colCustSummaryCart" prefWidth="350" text="Customization Summary" />
+                    <TableColumn fx:id="colTotalCart" prefWidth="160" text="Total Price" />
+                </columns>
+            </TableView>
 
-        </Label>
+            <HBox alignment="CENTER_RIGHT" spacing="20">
+                <Button onAction="#onHapusItemKeranjangClick" style="-fx-background-color: #C0392B; -fx-text-fill: white;" text="❌ Hapus Item Terpilih" />
+                <HBox alignment="CENTER_RIGHT" spacing="10" HBox.hgrow="ALWAYS">
+                    <Label text="TOTAL BAYAR FINAL:">
+                        <font>
+                            <Font name="System Bold" size="18" />
+                        </font>
+                    </Label>
+                    <Label fx:id="lblTotalBayar" text="Rp 0" style="-fx-text-fill: #27AE60;">
+                        <font>
+                            <Font name="System Bold" size="24" />
+                        </font>
+                    </Label>
+                </HBox>
+            </HBox>
 
+            <Button onAction="#onAddTransactionFinalClick" maxWidth="Infinity" prefHeight="48" style="-fx-background-color: #2980B9; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 15;" text="💾 SIMPAN TRANSAKSI FINAL (COMMIT TO POSTGRESQL)" />
+        </VBox>
     </center>
 
 </BorderPane>
