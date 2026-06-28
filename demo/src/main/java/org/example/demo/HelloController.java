@@ -20,7 +20,7 @@ public class HelloController {
         boolean isCurrentlyMaximized = stage.isMaximized();
 
         root = FXMLLoader.load(getClass().getResource("master-view.fxml"));
-        scene = new Scene(root);
+        scene = new Scene(root,1280,720);
 
         stage.setScene(scene);
         stage.setMaximized(isCurrentlyMaximized);
