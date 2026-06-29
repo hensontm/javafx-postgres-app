@@ -120,13 +120,16 @@ public class KelolaTransaksiController {
 
         // JOIN Kolaborasi multi-tabel antara order_detail, menu, order_customization, dan customization
         // AGGREGATION Menggabungkan varian topping belanjaan per-item menggunakan fungsi string_agg() biar rapi
-        String query = "SELECT m.nama_menu, od.jumlah_detail, COALESCE(string_agg(cu.nama_customization || ' (x' || ocu.jumlah_order_customization || ')', ', '), 'Original') as kustomisasi " +
-                "FROM public.order_detail od " +
-                "JOIN public.menu m ON od.id_menu = m.id_menu " +
-                "LEFT JOIN public.order_customization ocu ON od.id_detail = ocu.id_detail " +
-                "LEFT JOIN public.customization cu ON ocu.id_customization = cu.id_customization " +
-                "WHERE od.id_order = ? " +
-                "GROUP BY m.nama_menu, od.jumlah_detail";
+        String query =
+                "SELECT m.nama_menu, od.jumlah_detail, " +
+                        "COALESCE(string_agg(cu.nama_customization || ' (x' || ocu.jumlah_order_customization || ')', ', '), 'Original') AS kustomisasi " +
+                        "FROM public.order_detail od " +
+                        "JOIN public.menu m ON od.id_menu = m.id_menu " +
+                        "LEFT JOIN public.order_customization ocu ON od.id_detail = ocu.id_detail " +
+                        "LEFT JOIN public.customization cu ON ocu.id_customization = cu.id_customization " +
+                        "WHERE od.id_order = ? " +
+                        "GROUP BY od.id_detail, m.nama_menu, od.jumlah_detail " +
+                        "ORDER BY od.id_detail";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
