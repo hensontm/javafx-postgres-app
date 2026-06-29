@@ -199,7 +199,7 @@ public class MasterPaymentController {
         String kataKunci = txtCari.getText().toLowerCase().trim();
         daftarPayment.clear();
 
-        // JOIN Menghubungkan tabel sistem pembayaran dengan riwayat transaksi untuk penyaringan relasional pencarian nama payment
+        //JOIN Menghubungkan tabel sistem pembayaran dengan riwayat transaksi untuk penyaringan relasional pencarian nama payment
         String query = "SELECT DISTINCT mp.* FROM public.metode_payment mp " +
                 "WHERE LOWER(mp.metode_payment) LIKE ?";
 

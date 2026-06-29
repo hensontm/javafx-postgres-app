@@ -33,8 +33,8 @@
             <Label text="Branch ID" />
             <TextField fx:id="txtidBranch" promptText="ID Branch" />
 
-            <Label text="Ingredient Name" />
-            <TextField fx:id="txtnamaIngredient" promptText="Input ingredient name" />
+            <Label text="Menu ID" />
+            <TextField fx:id="txtidMenu" promptText="Input ingredient name" />
 
             <Label text="Stock" />
             <TextField fx:id="txtStok" promptText="Input stock amount" />
@@ -63,7 +63,7 @@
             </Label>
 
             <HBox spacing="10">
-                <TextField fx:id="txtCari" promptText="Search inventory" HBox.hgrow="ALWAYS" />
+                <TextField fx:id="txtCari" promptText="Nama Menu atau Nama Branch" HBox.hgrow="ALWAYS" />
                 <Button onAction="#onSearchBtnClick" text="SEARCH" />
                 <Button onAction="#onResetBtnClick" text="RESET" />
             </HBox>

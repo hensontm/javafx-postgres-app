@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="720" prefWidth="1280" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.MasterEmployeeController">
+<BorderPane prefHeight="720" prefWidth="1280" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.MasterEmployeeController">
 
     <left>
         <ScrollPane fitToWidth="true" prefWidth="340" style="-fx-background-color:#F4F4F4;">
@@ -70,7 +78,7 @@
             </Label>
 
             <HBox spacing="10">
-                <TextField fx:id="txtCari" promptText="Search employee by name, position, or address" HBox.hgrow="ALWAYS" />
+                <TextField fx:id="txtCari" promptText="Nama Karyawan atau Nama Jabatan atau Nama Cabang" HBox.hgrow="ALWAYS" />
                 <Button onAction="#onSearchBtnClick" text="SEARCH" />
                 <Button onAction="#onResetBtnClick" text="RESET" />
             </HBox>

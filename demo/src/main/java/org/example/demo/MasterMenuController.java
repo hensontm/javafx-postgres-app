@@ -209,7 +209,7 @@ public class MasterMenuController {
         String kataKunci = txtCari.getText().toLowerCase().trim();
         daftarMenu.clear();
 
-        // JOIN Menghubungkan tabel menu dengan tabel category produk untuk memfilter data pencarian secara relasional komprehensif
+        //JOIN Menghubungkan tabel menu dengan tabel category produk untuk memfilter data pencarian secara relasional komprehensif berdasarkan nama menu atau nama kategori
         String query = "SELECT m.* FROM public.menu m JOIN public.category c ON m.id_category = c.id_category " +
                 "WHERE LOWER(m.nama_menu) LIKE ? OR LOWER(c.nama_category) LIKE ?";
 

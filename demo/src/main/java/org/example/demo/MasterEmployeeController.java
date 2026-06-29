@@ -247,7 +247,7 @@ public class MasterEmployeeController {
         String kataKunci = txtCari.getText().toLowerCase().trim();
         daftarEmployee.clear();
 
-        // JOIN Menghubungkan tabel employee dengan tabel branch untuk melakukan pencarian silang berdasarkan filter lokasi cabang
+        //JOIN Menghubungkan tabel employee dengan tabel branch untuk melakukan pencarian silang berdasarkan filter lokasi cabang berdasarkan nama employee atau jabatan employee atau nama canag
         String query = "SELECT e.* FROM public.employee e JOIN public.branch b ON e.id_branch = b.id_branch " +
                 "WHERE LOWER(e.nama_employee) LIKE ? OR LOWER(e.jabatan_employee) LIKE ? OR LOWER(b.nama_branch) LIKE ?";
 

@@ -199,7 +199,7 @@ public class MasterCustomizationController {
         String kataKunci = txtCari.getText().toLowerCase().trim();
         daftarCustomization.clear();
 
-        // JOIN Menghubungkan master kustomisasi dengan tabel detail pesanan untuk mencari data berbasis filter transaksi aktif
+        //JOIN Menghubungkan master kustomisasi dengan tabel detail pesanan untuk mencari data berbasis filter transaksi aktif berdasarkan nama customization
         String query = "SELECT DISTINCT c.* FROM public.customization c " +
                 "WHERE LOWER(c.nama_customization) LIKE ?";
 

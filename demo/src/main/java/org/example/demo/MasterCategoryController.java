@@ -174,7 +174,7 @@ public class MasterCategoryController {
         String kataKunci = txtCari.getText().toLowerCase().trim();
         daftarCategory.clear();
 
-        // JOIN Menggabungkan tabel category dengan tabel menu untuk memfilter kategori berdasarkan relasi item menu aktif di dalamnya
+        //JOIN Menggabungkan tabel category dengan tabel menu untuk memfilter kategori berdasarkan relasi item menu aktif di dalamnya berdasarkan nama kategori
         String query = "SELECT DISTINCT c.* FROM public.category c " +
                 "WHERE LOWER(c.nama_category) LIKE ?";
 

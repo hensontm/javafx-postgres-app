@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="720" prefWidth="1280" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.MasterPaymentController">
+<BorderPane prefHeight="720" prefWidth="1280" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.MasterPaymentController">
 
     <left>
         <VBox prefWidth="320" spacing="15" style="-fx-background-color:#F4F4F4;">
@@ -22,13 +28,13 @@
             <Button onAction="#goBack" prefWidth="100" style="-fx-background-color:#808B96; -fx-text-fill:white;" text="← Back" />
 
             <Label text="Payment ID" />
-            <TextField fx:id="txtidPayment" promptText="ID Payment" />
+            <TextField fx:id="txtidMetodePayment" promptText="ID Payment" />
 
             <Label text="Payment Method" />
-            <TextField fx:id="txtmetodePayment" promptText="Input payment method" />
+            <TextField fx:id="txtMetodePayment" promptText="Input payment method" />
 
             <Label text="Discount (%)" />
-            <TextField fx:id="txtdiskonPayment" promptText="Input discount percentage" />
+            <TextField fx:id="txtDiskonMetodePayment" promptText="Input discount percentage" />
 
             <HBox spacing="10">
                 <Button onAction="#onAddBtnClick" prefWidth="90" style="-fx-background-color:#2ECC71; -fx-text-fill:white;" text="ADD" />
@@ -51,7 +57,7 @@
             </Label>
 
             <HBox spacing="10">
-                <TextField fx:id="txtCari" promptText="Search payment" HBox.hgrow="ALWAYS" />
+                <TextField fx:id="txtCari" promptText="Nama Payment" HBox.hgrow="ALWAYS" />
                 <Button onAction="#onSearchBtnClick" text="SEARCH" />
                 <Button onAction="#onResetBtnClick" text="RESET" />
             </HBox>

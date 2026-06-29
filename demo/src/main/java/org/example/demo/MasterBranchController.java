@@ -202,7 +202,7 @@ public class MasterBranchController {
         String kataKunci = txtCari.getText().toLowerCase().trim();
         daftarBranch.clear();
 
-        // JOIN Menggabungkan data branch dengan total karyawannya untuk melakukan pencarian relasional berdasarkan nama kota atau nama cabang
+        //JOIN Menggabungkan data branch dengan total karyawannya untuk melakukan pencarian relasional berdasarkan nama kota atau nama cabang
         String query = "SELECT b.* FROM public.branch b " +
                 "WHERE LOWER(b.nama_branch) LIKE ? OR LOWER(b.kota_branch) LIKE ? OR LOWER(b.alamat_branch) LIKE ?";
 

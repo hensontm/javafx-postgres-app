@@ -34,13 +34,13 @@
             <TextField fx:id="txtnamaBranch" promptText="Input branch name" />
 
             <Label text="Address" />
-            <TextField fx:id="txtalamatBranch" promptText="Input address" />
+            <TextField fx:id="txtAlamat" promptText="Input address" />
 
             <Label text="City" />
-            <TextField fx:id="txtkotaBranch" promptText="Input city" />
+            <TextField fx:id="txtKota" promptText="Input city" />
 
             <Label text="Postal Code" />
-            <TextField fx:id="txtkodePosBranch" promptText="Input postal code" />
+            <TextField fx:id="txtKodePos" promptText="Input postal code" />
 
             <HBox spacing="10">
                 <Button onAction="#onAddBtnClick" prefWidth="90" style="-fx-background-color:#2ECC71; -fx-text-fill:white;" text="ADD" />
@@ -63,7 +63,7 @@
             </Label>
 
             <HBox spacing="10">
-                <TextField fx:id="txtCari" promptText="Search branch" HBox.hgrow="ALWAYS" />
+                <TextField fx:id="txtCari" promptText="Nama Kota atau Nama Cabang" HBox.hgrow="ALWAYS" />
                 <Button onAction="#onSearchBtnClick" text="SEARCH" />
                 <Button onAction="#onResetBtnClick" text="RESET" />
             </HBox>

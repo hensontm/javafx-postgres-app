@@ -193,7 +193,7 @@ public class MasterCustomerController {
         String kataKunci = txtCari.getText().toLowerCase().trim();
         daftarCustomer.clear();
 
-        // JOIN Menggabungkan tabel customer dengan tabel order untuk memfilter pencarian nama customer secara relasional
+        //JOIN Menggabungkan tabel customer dengan tabel order untuk memfilter pencarian nama customer secara relasional berdasarkan nama customer atau no telpon atau email
         String query = "SELECT DISTINCT c.* FROM public.customer c " +
                 "WHERE LOWER(c.nama_cust) LIKE ? OR LOWER(c.telp_cust) LIKE ? OR LOWER(c.email_cust) LIKE ?";
 

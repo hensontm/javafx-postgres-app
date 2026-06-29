@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="720" prefWidth="1280" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.MasterCustomerController">
+<BorderPane prefHeight="720" prefWidth="1280" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.MasterCustomerController">
 
     <left>
         <VBox prefWidth="320" spacing="15" style="-fx-background-color:#F4F4F4;">
@@ -27,10 +33,10 @@
             <TextField fx:id="txtnamaCust" promptText="Input customer name" />
 
             <Label text="Email" />
-            <TextField fx:id="txtemailCust" promptText="example@email.com" />
+            <TextField fx:id="txtEmailCust" promptText="example@email.com" />
 
             <Label text="Phone Number" />
-            <TextField fx:id="txttelpCust" promptText="08123456789" />
+            <TextField fx:id="txtTelpCust" promptText="08123456789" />
 
             <HBox spacing="10">
                 <Button onAction="#onAddBtnClick" prefWidth="90" style="-fx-background-color:#2ECC71; -fx-text-fill:white;" text="ADD" />
@@ -53,7 +59,7 @@
             </Label>
 
             <HBox spacing="10">
-                <TextField fx:id="txtCari" promptText="Search customer" HBox.hgrow="ALWAYS" />
+                <TextField fx:id="txtCari" promptText="Nama Customer atau No.Telp Customer atau Email Customer" HBox.hgrow="ALWAYS" />
                 <Button onAction="#onSearchBtnClick" text="SEARCH" />
                 <Button onAction="#onResetBtnClick" text="RESET" />
             </HBox>

@@ -208,7 +208,7 @@ public class MasterInventoryController {
         String kataKunci = txtCari.getText().toLowerCase().trim();
         daftarInventory.clear();
 
-        // JOIN Menghubungkan tabel inventory dengan tabel menu dan branch untuk pencarian silang berbasis nama menu atau nama cabang
+        //JOIN Menghubungkan tabel inventory dengan tabel menu dan branch untuk pencarian silang berbasis nama menu atau nama cabang
         String query = "SELECT i.* FROM public.inventory i " +
                 "JOIN public.menu m ON i.id_menu = m.id_menu " +
                 "JOIN public.branch b ON i.id_branch = b.id_branch " +
