@@ -77,6 +77,9 @@
                             <TableColumn fx:id="colCustQtyTemp" prefWidth="70.0" text="Jumlah" />
                             <TableColumn fx:id="colCustPriceTemp" prefWidth="130.0" text="Total Harga" />
                         </columns>
+                  <columnResizePolicy>
+                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                  </columnResizePolicy>
                     </TableView>
 
                     <Button maxWidth="Infinity" onAction="#onTambahKeKeranjangClick" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10;" text="📥 Masukkan ke Keranjang Utama" />

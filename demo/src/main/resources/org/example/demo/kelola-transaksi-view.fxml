@@ -24,11 +24,6 @@
                     <Font name="System Bold" size="26.0" />
                 </font>
             </Label>
-            <Label text="Lacak, cari, dan kelola status 30 data dummy transaksi pelanggan" textFill="#666666">
-                <font>
-                    <Font size="14.0" />
-                </font>
-            </Label>
         </VBox>
     </top>
 
@@ -79,7 +74,6 @@
                 </Label>
                 <ComboBox fx:id="comboStatusUpdate" prefWidth="150.0" promptText="Pilih Status Baru" />
                 <Button onAction="#onUpdateStatusBtnClick" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;" text="Update Status" />
-                <Button onAction="#onShowStatisticClick" style="-fx-background-color: #9C27B0; -fx-text-fill: white;" text="📊 Tampilkan Statistik Gaji/Nota" />
                 <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
                     <Button onAction="#onDeleteTransaksiBtnClick" style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-weight: bold;" text="🗑️ Hapus Transaksi" />
                 </HBox>
@@ -97,6 +91,9 @@
                         <TableColumn fx:id="colJumlah" prefWidth="100.0" text="Jumlah Beli" />
                         <TableColumn fx:id="colKustomisasi" prefWidth="550.0" text="Pilihan Kustomisasi (Add-on Topping)" />
                     </columns>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
                 </TableView>
             </VBox>
 
