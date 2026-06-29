@@ -51,35 +51,80 @@ public class TransaksiController {
     private Scene scene;
     private Parent root;
 
+    // State Pelacak Mode Edit Keranjang
+    private boolean isEditMode = false;
+    private int selectedCartIndex = -1;
+
     // List Item sementara
     private final ObservableList<CartCustomization> listKustomisasiSementara = FXCollections.observableArrayList();
     private final ObservableList<CartItem> listKeranjangUtama = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
-        //Connect nilai ke kolom tabel sementara
+        //Connect nilai objek properti ke kolom tabel kecil kustomisasi sementara (Panel Kiri)
         colCustNameTemp.setCellValueFactory(new PropertyValueFactory<>("name"));
         colCustQtyTemp.setCellValueFactory(new PropertyValueFactory<>("qty"));
         colCustPriceTemp.setCellValueFactory(new PropertyValueFactory<>("totalPrice"));
         tabelKustomisasiSementara.setItems(listKustomisasiSementara);
 
-        //Connect nilai ke kolom tabel utama
+        //Connect nilai objek properti ke kolom tabel besar keranjang utama nota (Panel Kanan)
         colMenuNameCart.setCellValueFactory(new PropertyValueFactory<>("menuName"));
         colMenuQtyCart.setCellValueFactory(new PropertyValueFactory<>("qty"));
         colCustSummaryCart.setCellValueFactory(new PropertyValueFactory<>("customizationSummary"));
         colTotalCart.setCellValueFactory(new PropertyValueFactory<>("totalPrice"));
         tabelKeranjangUtama.setItems(listKeranjangUtama);
 
-        //Load semua dropdown dari PosgreSQL
+        //oad semua komponen dropdown data master dari PostgreSQL
         loadDropdownBranch();
         loadDropdownEmployee();
         loadDropdownPayment();
         loadDropdownMenu();
         loadDropdownCustomization();
 
-        // Listener dinamis agar total bayar terupdate real-time saat diskon diisi atau payment diubah
+        //Listener kalkulasi dinamis nilai total transaksi saat field diskon diisi atau payment diubah
         txtDiskon.textProperty().addListener((observable, oldValue, newValue) -> updateTotalBayarLabel());
         comboPayment.valueProperty().addListener((observable, oldValue, newValue) -> updateTotalBayarLabel());
+
+        //LISTENER SINGLE-CLICK (Tabel Kanan): Jika baris diklik, aktifkan MODE EDIT & lempar data ke kiri
+        tabelKeranjangUtama.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                isEditMode = true;
+                selectedCartIndex = tabelKeranjangUtama.getSelectionModel().getSelectedIndex();
+
+                // Kembalikan value Menu utama dan kuantitasnya ke field input kiri
+                comboMenu.setValue(newSelection.getMenuId() + " - " + newSelection.getMenuName());
+                txtQtyMenu.setText(String.valueOf(newSelection.getQty()));
+
+                // Bersihkan tabel kecil lalu muat ulang seluruh topping bawaan menu yang diklik
+                listKustomisasiSementara.clear();
+                listKustomisasiSementara.addAll(newSelection.getCustomizations());
+                tabelKustomisasiSementara.refresh();
+            }
+        });
+
+        //LISTENER DOUBLE-CLICK (Tabel Kecil Kiri): Memudahkan kasir menghapus topping instan tanpa ketik angka 0
+        tabelKustomisasiSementara.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) { // Memastikan user melakukan klik dua kali cepat
+                CartCustomization selectedTopping = tabelKustomisasiSementara.getSelectionModel().getSelectedItem();
+                if (selectedTopping != null) {
+                    listKustomisasiSementara.remove(selectedTopping);
+                    tabelKustomisasiSementara.refresh();
+
+                    // Jika sedang mode edit, otomatis update ringkasan harga di label bawah
+                    updateTotalBayarLabel();
+                }
+            }
+        });
+
+        //LISTENER SINGLE-CLICK (Tabel Kecil Kiri): Jika baris topping diklik, lempar balik ke kolom input topping di atasnya
+        tabelKustomisasiSementara.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                // Set isi ComboBox Topping sesuai format "ID - Nama" agar sinkron dengan method onTambahKustomisasiClick
+                comboCustomization.setValue(newSelection.getCustomId() + " - " + newSelection.getName());
+                // Set isi kuantitas topping ke textfield agar bisa langsung diedit angkanya
+                txtQtyCustom.setText(String.valueOf(newSelection.getQty()));
+            }
+        });
     }
 
     //Customization
@@ -104,9 +149,10 @@ public class TransaksiController {
             String namaAsliCustom = selectedCustomName.split(" - ")[1];
             double hargaSatuan = getCustomPriceFromDB(customId);
 
+            // PERBAIKAN UTAMA: Cari data lama berdasarkan kesamaan NAMA, bukan ID angka
             CartCustomization dataLama = null;
             for (CartCustomization c : listKustomisasiSementara) {
-                if (c.getCustomId() == customId) {
+                if (c.getName().equalsIgnoreCase(namaAsliCustom)) {
                     dataLama = c;
                     break;
                 }
@@ -116,13 +162,22 @@ public class TransaksiController {
                 if (dataLama != null) listKustomisasiSementara.remove(dataLama);
             } else {
                 if (dataLama != null) {
+                    // Jika data ditemukan, perbarui kuantitas dan kalkulasi harga barunya
                     dataLama.setQty(qtyInput);
                     dataLama.setTotalPrice(hargaSatuan * qtyInput);
                 } else {
+                    // Jika benar-benar topping baru, tambahkan objek baru ke list
                     listKustomisasiSementara.add(new CartCustomization(customId, namaAsliCustom, qtyInput, hargaSatuan * qtyInput));
                 }
             }
+
+            // Refresh paksa visual data tabel agar perubahan langsung merubut keluar di UI
             tabelKustomisasiSementara.refresh();
+
+            // Bersihkan field input topping atas agar kasir bisa input topping berikutnya
+            comboCustomization.setValue(null);
+            txtQtyCustom.clear();
+
         } catch (NumberFormatException e) {
             showWarningAlert("Format Salah", "Quantity kustomisasi harus berupa angka bulat!");
         }
@@ -160,9 +215,13 @@ public class TransaksiController {
             // Ambil batas maksimum kapasitas stok logistik cabang saat ini dari database
             int stokTersedia = getInventoryStockFromDB(menuId, branchId);
 
-            // Hitung akumulasi kuantitas jika menu yang sama sudah dimasukkan ke keranjang sebelumnya
+            // Hitung akumulasi kuantitas di keranjang (Kecuali item yang saat ini sedang kita edit sendiri)
             int totalQtyDiKeranjang = 0;
-            for (CartItem item : listKeranjangUtama) {
+            for (int i = 0; i < listKeranjangUtama.size(); i++) {
+                if (isEditMode && i == selectedCartIndex) {
+                    continue; // Lewati indeks item yang sedang diedit agar kalkulasi tidak double
+                }
+                CartItem item = listKeranjangUtama.get(i);
                 if (item.getMenuId() == menuId) {
                     totalQtyDiKeranjang += item.getQty();
                 }
@@ -173,25 +232,36 @@ public class TransaksiController {
                 showWarningAlert("Stok Tidak Mencukupi",
                         "Kuantitas item '" + namaAsliMenu + "' melebihi sisa stok di cabang ini!\n\n" +
                                 "• Stok Gudang Cabang: " + stokTersedia + " item\n" +
-                                "• Sudah di Keranjang: " + totalQtyDiKeranjang + " item\n" +
+                                "• Sudah di Keranjang (item lain): " + totalQtyDiKeranjang + " item\n" +
                                 "• Maksimal yang bisa ditambah: " + (stokTersedia - totalQtyDiKeranjang) + " item");
                 return;
             }
 
             double hargaMenu = getMenuPriceFromDB(menuId);
 
-            CartItem newItem = new CartItem(menuId, namaAsliMenu, qtyMenu, hargaMenu);
+            // Bikin objek CartItem baru hasil revisi / input baru
+            CartItem itemBaru = new CartItem(menuId, namaAsliMenu, qtyMenu, hargaMenu);
             for (CartCustomization cc : listKustomisasiSementara) {
-                newItem.addCustomization(cc);
+                itemBaru.addCustomization(cc);
             }
 
-            listKeranjangUtama.add(newItem);
+            if (isEditMode && selectedCartIndex >= 0) {
+                // KONDISI EDIT: Ganti data lama pada indeks tersebut dengan data baru hasil revisi
+                listKeranjangUtama.set(selectedCartIndex, itemBaru);
+                isEditMode = false;
+                selectedCartIndex = -1;
+            } else {
+                // KONDISI TAMBAH BIASA: Masukkan item baru langsung ke ujung list keranjang
+                listKeranjangUtama.add(itemBaru);
+            }
 
+            // Reset komponen input pilihan menu & topping di panel kiri ke kondisi semula
             listKustomisasiSementara.clear();
             comboMenu.setValue(null);
             txtQtyMenu.clear();
             comboCustomization.setValue(null);
             txtQtyCustom.clear();
+            tabelKeranjangUtama.getSelectionModel().clearSelection();
 
             updateTotalBayarLabel();
         } catch (NumberFormatException e) {
