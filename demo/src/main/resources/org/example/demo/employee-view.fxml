@@ -94,6 +94,9 @@
                     <TableColumn fx:id="colIdBranch" text="Branch ID" />
                     <TableColumn fx:id="colPhone" prefWidth="142.0" text="Phone" />
                 </columns>
+            <columnResizePolicy>
+               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy>
             </TableView>
         </VBox>
     </center>
