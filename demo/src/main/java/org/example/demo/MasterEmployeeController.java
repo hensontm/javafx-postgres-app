@@ -182,13 +182,26 @@ public class MasterEmployeeController {
         }
 
         try {
+            //Ambil data string murni dari komponen UI di awal
             String name = txtnamaEmployee.getText().trim();
             String position = comboPosition.getValue();
-            double salary = Double.parseDouble(txtSalary.getText().trim());
-            Date birthDate = Date.valueOf(txtTanggalLahir.getText().trim());
+            String salaryRaw = txtSalary.getText().trim();
+            String birthDateRaw = txtTanggalLahir.getText().trim();
             String address = txtAlamat.getText().trim();
-            int idBranch = Integer.parseInt(txtidBranch.getText().trim());
+            String idBranchRaw = txtidBranch.getText().trim();
             String phone = txtTelp.getText().trim();
+
+            //VALIDASI UTAMA: Cek kekosongan string murni dan ComboBox terlebih dahulu
+            if (name.isEmpty() || position == null || salaryRaw.isEmpty() || birthDateRaw.isEmpty() ||
+                    address.isEmpty() || idBranchRaw.isEmpty() || phone.isEmpty()) {
+                showWarningAlert("Input Kosong", "Semua kolom data wajib diisi!");
+                return;
+            }
+
+            //PARSING DATA: Aman dieksekusi karena string dijamin sudah ada isinya
+            double salary = Double.parseDouble(salaryRaw);
+            int idBranch = Integer.parseInt(idBranchRaw);
+            Date birthDate = Date.valueOf(birthDateRaw);
 
             // CONSTRAINT employee_gaji_employee_ck memastikan nilai gaji baru valid (>= 0)
             if (salary < 0) {
@@ -220,8 +233,10 @@ public class MasterEmployeeController {
                 // CONSTRAINT Memastikan update mematuhi aturan unique phone dan foreign key branch_id_branch_pk
                 showErrorAlert("Database Error", "Gagal memperbarui data: " + e.getMessage());
             }
+        } catch (NumberFormatException e) {
+            showErrorAlert("Format Salah", "Gaji dan Branch ID harus berupa angka yang valid!");
         } catch (IllegalArgumentException e) {
-            showErrorAlert("Input Salah", "Gaji/Branch ID harus angka dan format Tanggal Lahir harus YYYY-MM-DD!");
+            showErrorAlert("Format Salah", "Format Tanggal Lahir harus YYYY-MM-DD!");
         }
     }
 

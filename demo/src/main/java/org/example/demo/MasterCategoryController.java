@@ -124,25 +124,36 @@ public class MasterCategoryController {
             return;
         }
 
-        String name = txtnamaCategory.getText().trim();
+        try {
+            //Ambil data string murni dari komponen UI di awal
+            String name = txtnamaCategory.getText().trim();
 
-        String query = "UPDATE public.category SET nama_category = ? WHERE id_category = ?";
+            //VALIDASI UTAMA: Cek kekosongan string murni terlebih dahulu
+            if (name.isEmpty()) {
+                showWarningAlert("Input Kosong", "Semua kolom data wajib diisi!");
+                return;
+            }
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+            String query = "UPDATE public.category SET nama_category = ? WHERE id_category = ?";
 
-            stmt.setString(1, name);
-            stmt.setInt(2, selected.getIdCategory());
+            try (Connection conn = DatabaseConnection.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.executeUpdate();
+                stmt.setString(1, name);
+                stmt.setInt(2, selected.getIdCategory());
 
-            loadDataDariDatabase();
-            clearForm();
-            showInformationAlert("Sukses", "Data kategori berhasil diperbarui!");
+                stmt.executeUpdate();
 
-        } catch (SQLException e) {
-            // CONSTRAINT Memastikan pengubahan nama kategori mematuhi aturan unique agar tidak kembar dengan kategori lain
-            showErrorAlert("Database Error", "Gagal memperbarui data akibat constraint error: " + e.getMessage());
+                loadDataDariDatabase();
+                clearForm();
+                showInformationAlert("Sukses", "Data kategori berhasil diperbarui!");
+
+            } catch (SQLException e) {
+                // CONSTRAINT category_nama_category_uq mendeteksi duplikasi nama kategori menu saat update
+                showErrorAlert("Database Error", "Gagal memperbarui data akibat pelanggaran constraint: " + e.getMessage());
+            }
+        } catch (Exception e) {
+            showErrorAlert("System Error", "Terjadi kesalahan sistem saat memperbarui data: " + e.getMessage());
         }
     }
 

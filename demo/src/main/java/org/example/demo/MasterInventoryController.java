@@ -148,9 +148,21 @@ public class MasterInventoryController {
         }
 
         try {
-            int stock = Integer.parseInt(txtStok.getText().trim());
-            int idMenu = Integer.parseInt(txtidMenu.getText().trim());
-            int idBranch = Integer.parseInt(txtidBranch.getText().trim());
+            //Ambil data string murni dari komponen UI di awal
+            String stockRaw = txtStok.getText().trim();
+            String idMenuRaw = txtidMenu.getText().trim();
+            String idBranchRaw = txtidBranch.getText().trim();
+
+            //VALIDASI UTAMA: Cek kekosongan string murni terlebih dahulu
+            if (stockRaw.isEmpty() || idMenuRaw.isEmpty() || idBranchRaw.isEmpty()) {
+                showWarningAlert("Input Kosong", "Semua kolom data wajib diisi!");
+                return;
+            }
+
+            //PARSING DATA: Aman dieksekusi karena string dijamin sudah ada isinya
+            int stock = Integer.parseInt(stockRaw);
+            int idMenu = Integer.parseInt(idMenuRaw);
+            int idBranch = Integer.parseInt(idBranchRaw);
 
             // CONSTRAINT inventory_stok_inventory_ck memastikan pembaruan nilai jumlah stok baru tidak minus (>= 0)
             if (stock < 0) {

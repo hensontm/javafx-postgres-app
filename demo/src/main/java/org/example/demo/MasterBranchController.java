@@ -145,31 +145,42 @@ public class MasterBranchController {
             return;
         }
 
-        String name = txtnamaBranch.getText().trim();
-        String address = txtAlamat.getText().trim();
-        String city = txtKota.getText().trim();
-        String postalCode = txtKodePos.getText().trim();
+        try {
+            //Ambil data string murni dari komponen UI di awal
+            String name = txtnamaBranch.getText().trim();
+            String address = txtAlamat.getText().trim();
+            String city = txtKota.getText().trim();
+            String postalCode = txtKodePos.getText().trim();
 
-        String query = "UPDATE public.branch SET nama_branch = ?, alamat_branch = ?, kota_branch = ?, kode_pos_branch = ? WHERE id_branch = ?";
+            //VALIDASI UTAMA: Cek kekosongan string murni terlebih dahulu
+            if (name.isEmpty() || address.isEmpty() || city.isEmpty() || postalCode.isEmpty()) {
+                showWarningAlert("Input Kosong", "Semua kolom data wajib diisi!");
+                return;
+            }
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+            String query = "UPDATE public.branch SET nama_branch = ?, alamat_branch = ?, kota_branch = ?, kode_pos_branch = ? WHERE id_branch = ?";
 
-            stmt.setString(1, name);
-            stmt.setString(2, address);
-            stmt.setString(3, city);
-            stmt.setString(4, postalCode);
-            stmt.setInt(5, selected.getIdBranch());
+            try (Connection conn = DatabaseConnection.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.executeUpdate();
+                stmt.setString(1, name);
+                stmt.setString(2, address);
+                stmt.setString(3, city);
+                stmt.setString(4, postalCode);
+                stmt.setInt(5, selected.getIdBranch());
 
-            loadDataDariDatabase();
-            clearForm();
-            showInformationAlert("Sukses", "Data cabang berhasil diperbarui!");
+                stmt.executeUpdate();
 
-        } catch (SQLException e) {
-            // CONSTRAINT Memastikan pembaruan mematuhi unique constraint nama_branch agar tidak terjadi duplikasi data nama cabang
-            showErrorAlert("Database Error", "Gagal memperbarui data: " + e.getMessage());
+                loadDataDariDatabase();
+                clearForm();
+                showInformationAlert("Sukses", "Data cabang berhasil diperbarui!");
+
+            } catch (SQLException e) {
+                // CONSTRAINT branch_nama_branch_uq melempar error jika nama_branch baru melanggar unique constraint
+                showErrorAlert("Database Error", "Gagal memperbarui data akibat pelanggaran constraint: " + e.getMessage());
+            }
+        } catch (Exception e) {
+            showErrorAlert("System Error", "Terjadi kesalahan sistem saat memperbarui data: " + e.getMessage());
         }
     }
 

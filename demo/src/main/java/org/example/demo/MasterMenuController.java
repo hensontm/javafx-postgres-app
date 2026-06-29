@@ -142,18 +142,29 @@ public class MasterMenuController {
     public void onUpdateBtnClick() {
         Menu selected = tabelMenu.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            showWarningAlert("Aministrasi Ditolak", "Pilih data pada tabel yang ingin diubah!");
+            showWarningAlert("Aksi Ditolak", "Pilih data pada tabel yang ingin diubah!");
             return;
         }
 
         try {
+            //Ambil data string murni dari komponen UI di awal
             String name = txtnamaMenu.getText().trim();
-            double price = Double.parseDouble(txtHargaMenu.getText().trim());
-            int idCategory = Integer.parseInt(txtidCategory.getText().trim());
+            String priceRaw = txtHargaMenu.getText().trim();
+            String idCategoryRaw = txtidCategory.getText().trim();
 
-            // CONSTRAINT menu_harga_menu_ck memastikan nilai harga baru berada di atas nol (> 0)
-            if (price <= 0) {
-                showWarningAlert("Pelanggaran Constraint", "Harga menu harus lebih besar dari 0!");
+            //VALIDASI UTAMA: Cek kekosongan string murni terlebih dahulu
+            if (name.isEmpty() || priceRaw.isEmpty() || idCategoryRaw.isEmpty()) {
+                showWarningAlert("Input Kosong", "Semua kolom data wajib diisi!");
+                return;
+            }
+
+            //PARSING DATA: Aman dieksekusi karena string dijamin sudah ada isinya
+            double price = Double.parseDouble(priceRaw);
+            int idCategory = Integer.parseInt(idCategoryRaw);
+
+            // CONSTRAINT menu_harga_menu_ck nilai harga produk tidak boleh bernilai negatif (>= 0)
+            if (price < 0) {
+                showWarningAlert("Pelanggaran Constraint", "Harga menu tidak boleh negatif!");
                 return;
             }
 
@@ -174,11 +185,11 @@ public class MasterMenuController {
                 showInformationAlert("Sukses", "Data menu berhasil diperbarui!");
 
             } catch (SQLException e) {
-                // CONSTRAINT Mengunci validitas keunikan nama produk menu agar tidak terjadi bentrok duplikasi data
-                showErrorAlert("Database Error", "Gagal memperbarui data akibat constraint error: " + e.getMessage());
+                // CONSTRAINT menu_nama_menu_uq nama menu unik dan menu_id_category_fk foreign key check saat update
+                showErrorAlert("Database Error", "Gagal memperbarui data akibat pelanggaran constraint: " + e.getMessage());
             }
         } catch (NumberFormatException e) {
-            showErrorAlert("Input Salah", "Nominal harga dan Category ID wajib menggunakan format data angka!");
+            showErrorAlert("Format Salah", "ID Category harus berupa angka bulat, serta Harga harus berupa angka desimal valid!");
         }
     }
 

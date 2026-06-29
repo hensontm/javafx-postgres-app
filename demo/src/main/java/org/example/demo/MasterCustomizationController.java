@@ -139,12 +139,22 @@ public class MasterCustomizationController {
         }
 
         try {
+            //Ambil data string murni dari komponen UI di awal
             String name = txtnamaCustomization.getText().trim();
-            double price = Double.parseDouble(txtHargaCustomization.getText().trim());
+            String priceRaw = txtHargaCustomization.getText().trim();
 
-            // CONSTRAINT customization_harga_customization_ck menjamin nilai harga baru tidak bernilai negatif (>= 0)
+            //VALIDASI UTAMA: Cek kekosongan string murni terlebih dahulu
+            if (name.isEmpty() || priceRaw.isEmpty()) {
+                showWarningAlert("Input Kosong", "Semua kolom data wajib diisi!");
+                return;
+            }
+
+            //PARSING DATA: Aman dieksekusi karena string dijamin sudah ada isinya
+            double price = Double.parseDouble(priceRaw);
+
+            // CONSTRAINT customization_harga_customization_ck nilai harga tidak boleh bernilai negatif (>= 0)
             if (price < 0) {
-                showWarningAlert("Pelanggaran Constraint", "Harga customization tidak boleh kurang dari 0!");
+                showWarningAlert("Pelanggaran Constraint", "Harga kustomisasi tidak boleh negatif!");
                 return;
             }
 
@@ -164,11 +174,11 @@ public class MasterCustomizationController {
                 showInformationAlert("Sukses", "Data kustomisasi berhasil diperbarui!");
 
             } catch (SQLException e) {
-                // CONSTRAINT Mengunci keunikan nama kustomisasi agar tidak melanggar aturan unique key saat di-update
-                showErrorAlert("Database Error", "Gagal memperbarui data akibat constraint error: " + e.getMessage());
+                // CONSTRAINT customization_nama_customization_uq mendeteksi duplikasi nama varian saat update
+                showErrorAlert("Database Error", "Gagal memperbarui data akibat pelanggaran constraint: " + e.getMessage());
             }
         } catch (NumberFormatException e) {
-            showErrorAlert("Input Salah", "Nominal harga baru wajib diisi menggunakan format angka!");
+            showErrorAlert("Format Salah", "Harga harus berupa angka desimal atau bulat yang valid!");
         }
     }
 

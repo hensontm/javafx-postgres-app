@@ -139,8 +139,18 @@ public class MasterPaymentController {
         }
 
         try {
+            //Ambil data string murni dari komponen UI di awal
             String method = txtMetodePayment.getText().trim();
-            double discount = Double.parseDouble(txtDiskonMetodePayment.getText().trim());
+            String discountRaw = txtDiskonMetodePayment.getText().trim();
+
+            //VALIDASI UTAMA: Cek kekosongan string murni terlebih dahulu
+            if (method.isEmpty() || discountRaw.isEmpty()) {
+                showWarningAlert("Input Kosong", "Semua kolom data wajib diisi!");
+                return;
+            }
+
+            //PARSING DATA: Aman dieksekusi karena string dijamin sudah ada isinya
+            double discount = Double.parseDouble(discountRaw);
 
             // CONSTRAINT metode_payment_diskon_metode_payment_ck memastikan validitas data diskon baru (0 s/d 100)
             if (discount < 0 || discount > 100) {
@@ -168,7 +178,7 @@ public class MasterPaymentController {
                 showErrorAlert("Database Error", "Gagal memperbarui data akibat constraint error: " + e.getMessage());
             }
         } catch (NumberFormatException e) {
-            showErrorAlert("Input Salah", "Diskon metode pembayaran wajib diisi dengan nilai angka!");
+            showErrorAlert("Input Salah", "Diskon metode pembayaran wajib diisi dengan nilai angka desimal atau bulat!");
         }
     }
 

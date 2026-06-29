@@ -138,29 +138,40 @@ public class MasterCustomerController {
             return;
         }
 
-        String name = txtnamaCust.getText().trim();
-        String phone = txtTelpCust.getText().trim();
-        String email = txtEmailCust.getText().trim();
+        try {
+            //Ambil data string murni dari komponen UI di awal
+            String name = txtnamaCust.getText().trim();
+            String phone = txtTelpCust.getText().trim();
+            String email = txtEmailCust.getText().trim();
 
-        String query = "UPDATE public.customer SET nama_cust = ?, telp_cust = ?, email_cust = ? WHERE id_cust = ?";
+            //VALIDASI UTAMA: Cek kekosongan string murni terlebih dahulu
+            if (name.isEmpty() || phone.isEmpty() || email.isEmpty()) {
+                showWarningAlert("Input Kosong", "Semua kolom data wajib diisi!");
+                return;
+            }
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+            String query = "UPDATE public.customer SET nama_cust = ?, telp_cust = ?, email_cust = ? WHERE id_cust = ?";
 
-            stmt.setString(1, name);
-            stmt.setString(2, phone);
-            stmt.setString(3, email);
-            stmt.setInt(4, selected.getIdCust());
+            try (Connection conn = DatabaseConnection.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.executeUpdate();
+                stmt.setString(1, name);
+                stmt.setString(2, phone);
+                stmt.setString(3, email);
+                stmt.setInt(4, selected.getIdCust());
 
-            loadDataDariDatabase();
-            clearForm();
-            showInformationAlert("Sukses", "Data customer berhasil diperbarui!");
+                stmt.executeUpdate();
 
-        } catch (SQLException e) {
-            // CONSTRAINT Memastikan pembaruan nomor telepon atau email baru tidak bentrok dengan data milik customer lain
-            showErrorAlert("Database Error", "Gagal memperbarui data akibat constraint error: " + e.getMessage());
+                loadDataDariDatabase();
+                clearForm();
+                showInformationAlert("Sukses", "Data customer berhasil diperbarui!");
+
+            } catch (SQLException e) {
+                // CONSTRAINT customer_email_cust_uq dan customer_telp_cust_uq mendeteksi duplikasi data unik saat update
+                showErrorAlert("Database Error", "Gagal memperbarui data akibat pelanggaran constraint: " + e.getMessage());
+            }
+        } catch (Exception e) {
+            showErrorAlert("System Error", "Terjadi kesalahan sistem saat memperbarui data: " + e.getMessage());
         }
     }
 
