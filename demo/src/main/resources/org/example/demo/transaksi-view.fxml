@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="750.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.TransaksiController">
+<BorderPane prefHeight="750.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.TransaksiController">
 
     <top>
         <VBox spacing="5.0">
@@ -42,33 +42,33 @@
             <VBox prefWidth="450.0" spacing="15.0">
 
                 <VBox spacing="10.0" style="-fx-background-color: #f8f9fa; -fx-padding: 15; -fx-background-radius: 5;">
-                    <Label text="👤 Identitas Transaksi &amp; Pelanggan" style="-fx-font-weight: bold; -fx-font-size: 14;" />
+                    <Label style="-fx-font-weight: bold; -fx-font-size: 14;" text="👤 Identitas Transaksi &amp; Pelanggan" />
                     <TextField fx:id="txtNamaCust" promptText="Nama Customer" />
                     <TextField fx:id="txtTelpCust" promptText="No. Telepon Customer" />
                     <TextField fx:id="txtEmailCust" promptText="Email Customer (Unique &amp; Not Null)" />
                     <HBox spacing="10.0">
-                        <ComboBox fx:id="comboBranch" promptText="Pilih Cabang" HBox.hgrow="ALWAYS" prefWidth="200.0" />
-                        <ComboBox fx:id="comboEmployee" promptText="Pilih Karyawan" HBox.hgrow="ALWAYS" prefWidth="200.0" />
+                        <ComboBox fx:id="comboBranch" prefWidth="200.0" promptText="Pilih Cabang" HBox.hgrow="ALWAYS" />
+                        <ComboBox fx:id="comboEmployee" prefWidth="200.0" promptText="Pilih Karyawan" HBox.hgrow="ALWAYS" />
                     </HBox>
                     <HBox spacing="10.0">
-                        <ComboBox fx:id="comboPayment" promptText="Metode Pembayaran" prefWidth="200.0" />
-                        <TextField fx:id="txtDiskon" promptText="Diskon Toko (%)" prefWidth="200.0" />
+                        <ComboBox fx:id="comboPayment" prefWidth="200.0" promptText="Metode Pembayaran" />
+                        <TextField fx:id="txtDiskon" prefWidth="200.0" promptText="Diskon Toko (%)" />
                     </HBox>
                 </VBox>
 
-                <VBox spacing = "10.0" style="-fx-background-color: #f8f9fa; -fx-padding: 15; -fx-background-radius: 5;" VBox.vgrow="ALWAYS">
-                    <Label text="🍔 Pilihan Menu &amp; Topping" style="-fx-font-weight: bold; -fx-font-size: 14;" />
+                <VBox spacing="10.0" style="-fx-background-color: #f8f9fa; -fx-padding: 15; -fx-background-radius: 5;" VBox.vgrow="ALWAYS">
+                    <Label style="-fx-font-weight: bold; -fx-font-size: 14;" text="🍔 Pilihan Menu &amp; Topping" />
                     <HBox spacing="10.0">
-                        <ComboBox fx:id="comboMenu" promptText="Pilih Menu" prefWidth="250.0" />
-                        <TextField fx:id="txtQtyMenu" promptText="Qty" prefWidth="80.0" />
+                        <ComboBox fx:id="comboMenu" prefWidth="250.0" promptText="Pilih Menu" />
+                        <TextField fx:id="txtQtyMenu" prefWidth="80.0" promptText="Qty" />
                     </HBox>
 
                     <Separator prefWidth="200.0" />
 
-                    <HBox spacing="10.0" alignment="CENTER_LEFT">
-                        <ComboBox fx:id="comboCustomization" promptText="Pilih Topping/Custom" prefWidth="200.0" />
-                        <TextField fx:id="txtQtyCustom" promptText="Qty Topping" prefWidth="100.0" />
-                        <Button onAction="#onTambahKustomisasiClick" text="+ Topping" style="-fx-background-color: #9C27B0; -fx-text-fill: white;" />
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <ComboBox fx:id="comboCustomization" prefWidth="200.0" promptText="Pilih Topping/Custom" />
+                        <TextField fx:id="txtQtyCustom" prefWidth="100.0" promptText="Qty Topping" />
+                        <Button onAction="#onTambahKustomisasiClick" style="-fx-background-color: #9C27B0; -fx-text-fill: white;" text="+ Topping" />
                     </HBox>
 
                     <TableView fx:id="tabelKustomisasiSementara" prefHeight="120.0">
@@ -79,26 +79,26 @@
                         </columns>
                     </TableView>
 
-                    <Button onAction="#onTambahKeKeranjangClick" text="📥 Masukkan ke Keranjang Utama" maxWidth="Infinity" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10;" />
+                    <Button maxWidth="Infinity" onAction="#onTambahKeKeranjangClick" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10;" text="📥 Masukkan ke Keranjang Utama" />
                 </VBox>
             </VBox>
 
-            <VBox HBox.hgrow="ALWAYS" spacing="15.0">
+            <VBox spacing="15.0" HBox.hgrow="ALWAYS">
                 <VBox spacing="5.0" VBox.vgrow="ALWAYS">
-                    <Label text="🛒 Keranjang Belanja Utama Nota" style="-fx-font-weight: bold; -fx-font-size: 14;" />
+                    <Label style="-fx-font-weight: bold; -fx-font-size: 14;" text="🛒 Keranjang Belanja Utama Nota" />
                     <TableView fx:id="tabelKeranjangUtama" VBox.vgrow="ALWAYS">
                         <columns>
                             <TableColumn fx:id="colMenuNameCart" prefWidth="180.0" text="Nama Menu" />
                             <TableColumn fx:id="colMenuQtyCart" prefWidth="70.0" text="Qty" />
                             <TableColumn fx:id="colCustSummaryCart" prefWidth="280.0" text="Rincian Topping" />
-                            <TableColumn fx:id="colTotalCart" prefWidth="140.0" text="Subtotal (Rp)" />
+                            <TableColumn fx:id="colTotalCart" prefWidth="144.0" text="Subtotal (Rp)" />
                         </columns>
                     </TableView>
                 </VBox>
 
-                <HBox spacing="10.0" alignment="CENTER_LEFT">
-                    <Button onAction="#onHapusItemKeranjangClick" text="🗑️ Hapus Item Terpilih" style="-fx-background-color: #f44336; -fx-text-fill: white;" />
-                    <HBox HBox.hgrow="ALWAYS" alignment="CENTER_RIGHT" spacing="20.0">
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <Button onAction="#onHapusItemKeranjangClick" style="-fx-background-color: #f44336; -fx-text-fill: white;" text="🗑️ Hapus Item Terpilih" />
+                    <HBox alignment="CENTER_RIGHT" spacing="20.0" HBox.hgrow="ALWAYS">
                         <Label text="Total Bayar Final:">
                             <font>
                                 <Font name="System Bold" size="16.0" />
@@ -112,10 +112,10 @@
                     </HBox>
                 </HBox>
 
-                <HBox spacing="15.0" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
-                    <Button fx:id="btn_back" onAction="#goBack" text="← Back ke Transaksi Home" prefWidth="200.0" prefHeight="40.0" style="-fx-font-size: 13;" />
-                    <HBox HBox.hgrow="ALWAYS" alignment="CENTER_RIGHT">
-                        <Button onAction="#onAddTransactionFinalClick" text="💾 Simpan Transaksi Permanen" prefWidth="280.0" prefHeight="40.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14;" />
+                <HBox alignment="CENTER_RIGHT" spacing="15.0" style="-fx-padding: 10 0 0 0;">
+                    <Button fx:id="btn_back" onAction="#goBack" prefHeight="40.0" prefWidth="200.0" style="-fx-font-size: 13;" text="← Back ke Transaksi Home" />
+                    <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                        <Button onAction="#onAddTransactionFinalClick" prefHeight="40.0" prefWidth="280.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14;" text="💾 Simpan Transaksi Permanen" />
                     </HBox>
                 </HBox>
             </VBox>

@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="750.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.KelolaTransaksiController">
+<BorderPane prefHeight="750.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.KelolaTransaksiController">
 
     <top>
         <VBox spacing="5.0">
@@ -44,8 +44,8 @@
                         <Font name="System Bold" size="13.0" />
                     </font>
                 </Label>
-                <TextField fx:id="txtCari" promptText="Ketik nama customer / cabang..." prefWidth="300.0" />
-                <Button onAction="#onSearchBtnClick" text="🔍 Search" style="-fx-background-color: #2196F3; -fx-text-fill: white;" />
+                <TextField fx:id="txtCari" prefWidth="300.0" promptText="Ketik nama customer / cabang..." />
+                <Button onAction="#onSearchBtnClick" style="-fx-background-color: #2196F3; -fx-text-fill: white;" text="🔍 Search" />
                 <Button onAction="#onResetBtnClick" text="🔄 Reset" />
             </HBox>
 
@@ -59,11 +59,11 @@
                     <columns>
                         <TableColumn fx:id="colIdOrder" prefWidth="80.0" text="ID Order" />
                         <TableColumn fx:id="colTanggal" prefWidth="110.0" text="Tanggal" />
-                        <TableColumn fx:id="colWaktu" prefWidth="90.0" text="Waktu" />
-                        <TableColumn fx:id="colCustomer" prefWidth="200.0" text="Nama Customer" />
-                        <TableColumn fx:id="colBranch" prefWidth="180.0" text="Cabang Restoran" />
-                        <TableColumn fx:id="colTotalBayar" prefWidth="140.0" text="Total Bayar (Rp)" />
-                        <TableColumn fx:id="colStatus" prefWidth="120.0" text="Status Order" />
+                        <TableColumn fx:id="colWaktu" prefWidth="121.0" text="Waktu" />
+                        <TableColumn fx:id="colCustomer" prefWidth="187.5" text="Nama Customer" />
+                        <TableColumn fx:id="colBranch" prefWidth="183.5" text="Cabang Restoran" />
+                        <TableColumn fx:id="colTotalBayar" prefWidth="152.5" text="Total Bayar (Rp)" />
+                        <TableColumn fx:id="colStatus" prefWidth="214.5" text="Status Order" />
                     </columns>
                 </TableView>
             </VBox>
@@ -74,11 +74,11 @@
                         <Font name="System Bold" size="13.0" />
                     </font>
                 </Label>
-                <ComboBox fx:id="comboStatusUpdate" promptText="Pilih Status Baru" prefWidth="150.0" />
-                <Button onAction="#onUpdateStatusBtnClick" text="Update Status" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;" />
-                <Button onAction="#onShowStatisticClick" text="📊 Tampilkan Statistik Gaji/Nota" style="-fx-background-color: #9C27B0; -fx-text-fill: white;" />
-                <HBox HBox.hgrow="ALWAYS" alignment="CENTER_RIGHT">
-                    <Button onAction="#onDeleteTransaksiBtnClick" text="🗑️ Hapus Transaksi" style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-weight: bold;" />
+                <ComboBox fx:id="comboStatusUpdate" prefWidth="150.0" promptText="Pilih Status Baru" />
+                <Button onAction="#onUpdateStatusBtnClick" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;" text="Update Status" />
+                <Button onAction="#onShowStatisticClick" style="-fx-background-color: #9C27B0; -fx-text-fill: white;" text="📊 Tampilkan Statistik Gaji/Nota" />
+                <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                    <Button onAction="#onDeleteTransaksiBtnClick" style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-weight: bold;" text="🗑️ Hapus Transaksi" />
                 </HBox>
             </HBox>
 
@@ -98,7 +98,7 @@
             </VBox>
 
             <HBox alignment="CENTER_LEFT">
-                <Button onAction="#goBack" text="&lt;-- Back" prefWidth="120.0" style="-fx-font-size: 13;" />
+                <Button onAction="#goBack" prefWidth="120.0" style="-fx-font-size: 13;" text="&lt;-- Back" />
             </HBox>
 
         </VBox>
