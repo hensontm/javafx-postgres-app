@@ -24,11 +24,6 @@
                     <Font name="System Bold" size="26.0" />
                 </font>
             </Label>
-            <Label text="Lacak, cari, dan kelola status 30 data dummy transaksi pelanggan" textFill="#666666">
-                <font>
-                    <Font size="14.0" />
-                </font>
-            </Label>
         </VBox>
     </top>
 
@@ -96,6 +91,9 @@
                         <TableColumn fx:id="colJumlah" prefWidth="100.0" text="Jumlah Beli" />
                         <TableColumn fx:id="colKustomisasi" prefWidth="550.0" text="Pilihan Kustomisasi (Add-on Topping)" />
                     </columns>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
                 </TableView>
             </VBox>
 
