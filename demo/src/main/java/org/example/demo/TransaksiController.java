@@ -250,7 +250,7 @@ public class TransaksiController {
             int orderId = getNextId(conn, "SELECT COALESCE(MAX(id_order), 0) + 1 FROM public.customer_order");
 
             // Memperbaiki status dari 'Selasai' menjadi 'Selesai' agar lolos validasi CHECK Constraint public.customer_order
-            String queryOrder = "INSERT INTO public.customer_order (id_order, tanggal_order, waktu_order, diskon_restoran, total_order, total_bayar, status_order, id_cust, id_branch, id_employee, id_metode_payment) VALUES (?, CURRENT_DATE, CURRENT_TIME, ?, ?, ?, 'Selesai', ?, ?, ?, ?)";
+            String queryOrder = "INSERT INTO public.customer_order (id_order, tanggal_order, waktu_order, diskon_restoran, total_order, total_bayar, status_order, id_cust, id_branch, id_employee, id_metode_payment) VALUES (?, CURRENT_DATE, CURRENT_TIME, ?, ?, ?, 'Pending', ?, ?, ?, ?)";
 
             try (PreparedStatement stmtOrder = conn.prepareStatement(queryOrder)) {
                 stmtOrder.setInt(1, orderId);
