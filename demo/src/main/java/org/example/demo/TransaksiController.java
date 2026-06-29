@@ -132,6 +132,13 @@ public class TransaksiController {
     @FXML
     public void onTambahKeKeranjangClick() {
         String selectedMenuName = comboMenu.getValue();
+        String selectedBranch = comboBranch.getValue();
+
+        if (selectedBranch == null) {
+            showWarningAlert("Cabang Belum Dipilih", "Silakan pilih Cabang (Branch) terlebih dahulu di form atas untuk memastikan ketersediaan stok!");
+            return;
+        }
+
         if (selectedMenuName == null || txtQtyMenu.getText().trim().isEmpty()) {
             showWarningAlert("Input Kosong", "Pilih menu dan isi jumlah beli!");
             return;
@@ -148,6 +155,29 @@ public class TransaksiController {
 
             int menuId = Integer.parseInt(selectedMenuName.split(" - ")[0]);
             String namaAsliMenu = selectedMenuName.split(" - ")[1];
+            int branchId = Integer.parseInt(selectedBranch.split(" - ")[0]);
+
+            // Ambil batas maksimum kapasitas stok logistik cabang saat ini dari database
+            int stokTersedia = getInventoryStockFromDB(menuId, branchId);
+
+            // Hitung akumulasi kuantitas jika menu yang sama sudah dimasukkan ke keranjang sebelumnya
+            int totalQtyDiKeranjang = 0;
+            for (CartItem item : listKeranjangUtama) {
+                if (item.getMenuId() == menuId) {
+                    totalQtyDiKeranjang += item.getQty();
+                }
+            }
+
+            // VALIDASI UTAMA: Blokir jika total permintaan belanja melampaui sisa stok riil cabang
+            if ((totalQtyDiKeranjang + qtyMenu) > stokTersedia) {
+                showWarningAlert("Stok Tidak Mencukupi",
+                        "Kuantitas item '" + namaAsliMenu + "' melebihi sisa stok di cabang ini!\n\n" +
+                                "• Stok Gudang Cabang: " + stokTersedia + " item\n" +
+                                "• Sudah di Keranjang: " + totalQtyDiKeranjang + " item\n" +
+                                "• Maksimal yang bisa ditambah: " + (stokTersedia - totalQtyDiKeranjang) + " item");
+                return;
+            }
+
             double hargaMenu = getMenuPriceFromDB(menuId);
 
             CartItem newItem = new CartItem(menuId, namaAsliMenu, qtyMenu, hargaMenu);
@@ -167,6 +197,26 @@ public class TransaksiController {
         } catch (NumberFormatException e) {
             showWarningAlert("Format Salah", "Quantity menu harus berupa angka bulat!");
         }
+    }
+
+    //Metode Helper onTambahKeranjangClick untuk mengambil data stok
+    private int getInventoryStockFromDB(int menuId, int branchId) {
+        String query = "SELECT stok_inventory FROM public.inventory WHERE id_menu = ? AND id_branch = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, menuId);
+            stmt.setInt(2, branchId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("stok_inventory");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0; // Mengembalikan 0 jika data record logistik inventori tidak ditemukan
     }
 
     @FXML
@@ -341,6 +391,7 @@ public class TransaksiController {
         } catch (SQLException e) { e.printStackTrace(); }
         return 0.0;
     }
+
 
     //Tampilkan Data ComboBox dari PosgreSQL
     private void loadDropdownBranch() {
