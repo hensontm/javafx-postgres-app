@@ -25,7 +25,7 @@
                 </font>
             </Label>
 
-            <Button onAction="#goBack" prefWidth="100" style="-fx-background-color:#808B96; -fx-text-fill:white;" text="← Back" />
+            <Button onAction="#goBack" prefWidth="100" style="-fx-background-color:#808B96; -fx-text-fill:white;" text="Back" />
 
             <Label text="Inventory ID" />
             <TextField fx:id="txtidInventory" promptText="ID Inventory" />
@@ -39,10 +39,7 @@
             <Label text="Stock" />
             <TextField fx:id="txtStok" promptText="Input stock amount" />
 
-            <Label text="Unit" />
-            <TextField fx:id="txtUnit" promptText="e.g. Kg, Pcs, Liter" />
-
-            <HBox spacing="10">
+            <HBox spacing="10" style="-fx-padding: 10 0 0 0;">
                 <Button onAction="#onAddBtnClick" prefWidth="90" style="-fx-background-color:#2ECC71; -fx-text-fill:white;" text="ADD" />
                 <Button onAction="#onUpdateBtnClick" prefWidth="90" style="-fx-background-color:#3498DB; -fx-text-fill:white;" text="UPDATE" />
                 <Button onAction="#onDeleteBtnClick" prefWidth="90" style="-fx-background-color:#E74C3C; -fx-text-fill:white;" text="DELETE" />

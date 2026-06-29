@@ -79,13 +79,18 @@ public class MasterCategoryController {
     @FXML
     public void onAddBtnClick() {
         try {
-            if (txtidCategory.getText().trim().isEmpty() || txtnamaCategory.getText().trim().isEmpty()) {
+            //Ambil data string murni dari komponen UI di awal
+            String idRaw = txtidCategory.getText().trim();
+            String name = txtnamaCategory.getText().trim();
+
+            //VALIDASI UTAMA: Cek kekosongan string murni terlebih dahulu
+            if (idRaw.isEmpty() || name.isEmpty()) {
                 showWarningAlert("Input Kosong", "Semua kolom data wajib diisi!");
                 return;
             }
 
-            int id = Integer.parseInt(txtidCategory.getText().trim());
-            String name = txtnamaCategory.getText().trim();
+            //PARSING DATA: Aman dieksekusi karena string ID dijamin sudah ada isinya
+            int id = Integer.parseInt(idRaw);
 
             String query = "INSERT INTO public.category (id_category, nama_category) VALUES (?, ?)";
 
@@ -102,7 +107,7 @@ public class MasterCategoryController {
                 showInformationAlert("Sukses", "Data kategori berhasil ditambahkan!");
 
             } catch (SQLException e) {
-                // CONSTRAINT category_nama_category_uq mencegah duplikasi nama kategori yang sama di database
+                // CONSTRAINT category_nama_category_uq mendeteksi duplikasi nama kategori menu
                 showErrorAlert("Database Error", "Gagal menyimpan data akibat pelanggaran constraint: " + e.getMessage());
             }
         } catch (NumberFormatException e) {

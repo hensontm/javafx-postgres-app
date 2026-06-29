@@ -92,7 +92,7 @@
                     <TableColumn fx:id="colBirthDate" prefWidth="100" text="Birth Date" />
                     <TableColumn fx:id="colAddress" prefWidth="157.0" text="Address" />
                     <TableColumn fx:id="colIdBranch" text="Branch ID" />
-                    <TableColumn fx:id="colPhone" prefWidth="141.0" text="Phone" />
+                    <TableColumn fx:id="colPhone" prefWidth="142.0" text="Phone" />
                 </columns>
             </TableView>
         </VBox>

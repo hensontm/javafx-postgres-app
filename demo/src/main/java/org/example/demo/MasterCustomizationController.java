@@ -84,18 +84,24 @@ public class MasterCustomizationController {
     @FXML
     public void onAddBtnClick() {
         try {
-            if (txtidCustomization.getText().trim().isEmpty() || txtnamaCustomization.getText().trim().isEmpty() || txtHargaCustomization.getText().trim().isEmpty()) {
+            //Ambil data string murni dari komponen UI di awal
+            String idRaw = txtidCustomization.getText().trim();
+            String name = txtnamaCustomization.getText().trim();
+            String priceRaw = txtHargaCustomization.getText().trim();
+
+            //VALIDASI UTAMA: Cek kekosongan string murni terlebih dahulu
+            if (idRaw.isEmpty() || name.isEmpty() || priceRaw.isEmpty()) {
                 showWarningAlert("Input Kosong", "Semua kolom data wajib diisi!");
                 return;
             }
 
-            int id = Integer.parseInt(txtidCustomization.getText().trim());
-            String name = txtnamaCustomization.getText().trim();
-            double price = Double.parseDouble(txtHargaCustomization.getText().trim());
+            //PARSING DATA: Aman dieksekusi karena string ID dijamin sudah ada isinya
+            int id = Integer.parseInt(idRaw);
+            double price = Double.parseDouble(priceRaw);
 
-            // CONSTRAINT customization_harga_customization_ck memastikan nominal harga add-on tidak boleh minus (>= 0)
+            // CONSTRAINT customization_harga_customization_ck nilai harga tidak boleh bernilai negatif (>= 0)
             if (price < 0) {
-                showWarningAlert("Pelanggaran Constraint", "Harga customization tidak boleh kurang dari 0!");
+                showWarningAlert("Pelanggaran Constraint", "Harga kustomisasi tidak boleh negatif!");
                 return;
             }
 
@@ -115,11 +121,11 @@ public class MasterCustomizationController {
                 showInformationAlert("Sukses", "Data kustomisasi berhasil ditambahkan!");
 
             } catch (SQLException e) {
-                // CONSTRAINT customization_nama_customization_uq melempar error jika ada kesamaan nama add-on di database
+                // CONSTRAINT customization_nama_customization_uq mendeteksi duplikasi nama varian
                 showErrorAlert("Database Error", "Gagal menyimpan data akibat pelanggaran constraint: " + e.getMessage());
             }
         } catch (NumberFormatException e) {
-            showErrorAlert("Format Salah", "ID dan Harga harus diisi dengan angka valid!");
+            showErrorAlert("Format Salah", "ID harus berupa angka bulat dan Harga harus berupa angka valid!");
         }
     }
 

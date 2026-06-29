@@ -94,17 +94,21 @@ public class MasterBranchController {
     @FXML
     public void onAddBtnClick() {
         try {
-            if (txtidBranch.getText().trim().isEmpty() || txtnamaBranch.getText().trim().isEmpty() ||
-                    txtAlamat.getText().trim().isEmpty() || txtKota.getText().trim().isEmpty() || txtKodePos.getText().trim().isEmpty()) {
-                showWarningAlert("Input Kosong", "Semua kolom data wajib diisi!");
-                return;
-            }
-
-            int id = Integer.parseInt(txtidBranch.getText().trim());
+            //Ambil data string murni dari komponen UI di awal
+            String idRaw = txtidBranch.getText().trim();
             String name = txtnamaBranch.getText().trim();
             String address = txtAlamat.getText().trim();
             String city = txtKota.getText().trim();
             String postalCode = txtKodePos.getText().trim();
+
+            //VALIDASI UTAMA: Cek kekosongan string murni terlebih dahulu
+            if (idRaw.isEmpty() || name.isEmpty() || address.isEmpty() || city.isEmpty() || postalCode.isEmpty()) {
+                showWarningAlert("Input Kosong", "Semua kolom data wajib diisi!");
+                return;
+            }
+
+            //PARSING DATA: Aman dieksekusi karena string ID dijamin sudah ada isinya
+            int id = Integer.parseInt(idRaw);
 
             String query = "INSERT INTO public.branch (id_branch, nama_branch, alamat_branch, kota_branch, kode_pos_branch) VALUES (?, ?, ?, ?, ?)";
 
@@ -125,7 +129,7 @@ public class MasterBranchController {
 
             } catch (SQLException e) {
                 // CONSTRAINT branch_nama_branch_uq melempar error jika nama_branch melanggar unique constraint
-                showErrorAlert("Database Error", "Gagal menyimpan data: " + e.getMessage());
+                showErrorAlert("Database Error", "Gagal menyimpan data akibat pelanggaran constraint: " + e.getMessage());
             }
         } catch (NumberFormatException e) {
             showErrorAlert("Format Salah", "Branch ID harus berupa angka bulat!");

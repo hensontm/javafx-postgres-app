@@ -89,16 +89,20 @@ public class MasterCustomerController {
     @FXML
     public void onAddBtnClick() {
         try {
-            if (txtidCust.getText().trim().isEmpty() || txtnamaCust.getText().trim().isEmpty() ||
-                    txtTelpCust.getText().trim().isEmpty() || txtEmailCust.getText().trim().isEmpty()) {
-                showWarningAlert("Input Kosong", "Semua kolom data wajib diisi!");
-                return;
-            }
-
-            int id = Integer.parseInt(txtidCust.getText().trim());
+            //Ambil data string murni dari komponen UI di awal
+            String idRaw = txtidCust.getText().trim();
             String name = txtnamaCust.getText().trim();
             String phone = txtTelpCust.getText().trim();
             String email = txtEmailCust.getText().trim();
+
+            //VALIDASI UTAMA: Cek kekosongan string murni terlebih dahulu
+            if (idRaw.isEmpty() || name.isEmpty() || phone.isEmpty() || email.isEmpty()) {
+                showWarningAlert("Input Kosong", "Semua kolom data wajib diisi!");
+                return; // Berhenti di sini jika ada field yang kosong
+            }
+
+            //PARSING DATA: Aman dieksekusi karena string ID dijamin sudah ada isinya
+            int id = Integer.parseInt(idRaw);
 
             String query = "INSERT INTO public.customer (id_cust, nama_cust, telp_cust, email_cust) VALUES (?, ?, ?, ?)";
 

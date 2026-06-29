@@ -84,14 +84,20 @@ public class MasterPaymentController {
     @FXML
     public void onAddBtnClick() {
         try {
-            if (txtidMetodePayment.getText().trim().isEmpty() || txtMetodePayment.getText().trim().isEmpty() || txtDiskonMetodePayment.getText().trim().isEmpty()) {
+            //Ambil data string murni dari komponen UI di awal
+            String idRaw = txtidMetodePayment.getText().trim();
+            String method = txtMetodePayment.getText().trim();
+            String discountRaw = txtDiskonMetodePayment.getText().trim();
+
+            //VALIDASI UTAMA: Cek kekosongan string murni terlebih dahulu
+            if (idRaw.isEmpty() || method.isEmpty() || discountRaw.isEmpty()) {
                 showWarningAlert("Input Kosong", "Semua kolom data wajib diisi!");
                 return;
             }
 
-            int id = Integer.parseInt(txtidMetodePayment.getText().trim());
-            String method = txtMetodePayment.getText().trim();
-            double discount = Double.parseDouble(txtDiskonMetodePayment.getText().trim());
+            //PARSING DATA: Aman dieksekusi karena string ID dijamin sudah ada isinya
+            int id = Integer.parseInt(idRaw);
+            double discount = Double.parseDouble(discountRaw);
 
             // CONSTRAINT metode_payment_diskon_metode_payment_ck rentang diskon wajib di antara 0 s/d 100 persen
             if (discount < 0 || discount > 100) {

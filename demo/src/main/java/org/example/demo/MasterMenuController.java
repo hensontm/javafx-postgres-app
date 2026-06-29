@@ -89,20 +89,26 @@ public class MasterMenuController {
     @FXML
     public void onAddBtnClick() {
         try {
-            if (txtidMenu.getText().trim().isEmpty() || txtnamaMenu.getText().trim().isEmpty() ||
-                    txtHargaMenu.getText().trim().isEmpty() || txtidCategory.getText().trim().isEmpty()) {
+            //Ambil data string murni dari komponen UI di awal
+            String idRaw = txtidMenu.getText().trim();
+            String name = txtnamaMenu.getText().trim();
+            String priceRaw = txtHargaMenu.getText().trim();
+            String idCategoryRaw = txtidCategory.getText().trim();
+
+            //VALIDASI UTAMA: Cek kekosongan string murni terlebih dahulu
+            if (idRaw.isEmpty() || name.isEmpty() || priceRaw.isEmpty() || idCategoryRaw.isEmpty()) {
                 showWarningAlert("Input Kosong", "Semua kolom data wajib diisi!");
                 return;
             }
 
-            int id = Integer.parseInt(txtidMenu.getText().trim());
-            String name = txtnamaMenu.getText().trim();
-            double price = Double.parseDouble(txtHargaMenu.getText().trim());
-            int idCategory = Integer.parseInt(txtidCategory.getText().trim());
+            //PARSING DATA: Aman dieksekusi karena string ID dijamin sudah ada isinya
+            int id = Integer.parseInt(idRaw);
+            double price = Double.parseDouble(priceRaw);
+            int idCategory = Integer.parseInt(idCategoryRaw);
 
-            // CONSTRAINT menu_harga_menu_ck memastikan nominal harga menu wajib di atas nol (> 0)
-            if (price <= 0) {
-                showWarningAlert("Pelanggaran Constraint", "Harga menu harus lebih besar dari 0!");
+            // CONSTRAINT menu_harga_menu_ck nilai harga produk tidak boleh bernilai negatif (>= 0)
+            if (price < 0) {
+                showWarningAlert("Pelanggaran Constraint", "Harga menu tidak boleh negatif!");
                 return;
             }
 
@@ -123,11 +129,11 @@ public class MasterMenuController {
                 showInformationAlert("Sukses", "Data menu berhasil ditambahkan!");
 
             } catch (SQLException e) {
-                // CONSTRAINT menu_nama_menu_uq atau menu_id_category_fk validasi data unik dan kecocokan foreign key id kategori
+                // CONSTRAINT menu_nama_menu_uq nama menu unik dan menu_id_category_fk foreign key check
                 showErrorAlert("Database Error", "Gagal menyimpan data akibat pelanggaran constraint: " + e.getMessage());
             }
         } catch (NumberFormatException e) {
-            showErrorAlert("Format Salah", "ID/Harga harus diisi angka!");
+            showErrorAlert("Format Salah", "ID dan ID Category harus berupa angka bulat, serta Harga harus berupa angka valid!");
         }
     }
 

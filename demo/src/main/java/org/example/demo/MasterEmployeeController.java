@@ -112,21 +112,30 @@ public class MasterEmployeeController {
     @FXML
     public void onAddBtnClick() {
         try {
-            int id = Integer.parseInt(txtidEmployee.getText().trim());
+            //Ambil data string murni dari komponen UI dulu
+            String idRaw = txtidEmployee.getText().trim();
             String name = txtnamaEmployee.getText().trim();
             String position = comboPosition.getValue();
-            double salary = Double.parseDouble(txtSalary.getText().trim());
-            Date birthDate = Date.valueOf(txtTanggalLahir.getText().trim());
+            String salaryRaw = txtSalary.getText().trim();
+            String birthDateRaw = txtTanggalLahir.getText().trim();
             String address = txtAlamat.getText().trim();
-            int idBranch = Integer.parseInt(txtidBranch.getText().trim());
+            String idBranchRaw = txtidBranch.getText().trim();
             String phone = txtTelp.getText().trim();
 
-            if (name.isEmpty() || position == null || address.isEmpty() || phone.isEmpty()) {
+            //VALIDASI UTAMA: Cek kekosongan string murni terlebih dahulu!
+            if (idRaw.isEmpty() || name.isEmpty() || position == null || salaryRaw.isEmpty() ||
+                    birthDateRaw.isEmpty() || address.isEmpty() || idBranchRaw.isEmpty() || phone.isEmpty()) {
                 showWarningAlert("Input Kosong", "Semua kolom data wajib diisi!");
-                return;
+                return; // Berhenti di sini kalau ada yang kosong
             }
 
-            // CONSTRAINT employee_gaji_employee_ck nilai gaji tidak boleh bernilai negatif (>= 0)
+            //PARSING DATA: Aman dieksekusi karena string dijamin sudah ada isinya
+            int id = Integer.parseInt(idRaw);
+            double salary = Double.parseDouble(salaryRaw);
+            Date birthDate = Date.valueOf(birthDateRaw); // Tidak akan crash karena string tidak kosong
+            int idBranch = Integer.parseInt(idBranchRaw);
+
+            //CONSTRAINT employee_gaji_employee_ck nilai gaji tidak boleh bernilai negatif (>= 0)
             if (salary < 0) {
                 showWarningAlert("Pelanggaran Constraint", "Gaji tidak boleh negatif!");
                 return;
@@ -156,6 +165,8 @@ public class MasterEmployeeController {
                 // CONSTRAINT employee_id_branch_fk validasi foreign key branch dan employee_telp_employee_uq unique phone
                 showErrorAlert("Database Error", "Gagal menyimpan data: " + e.getMessage());
             }
+        } catch (NumberFormatException e) {
+            showErrorAlert("Format Salah", "ID, Gaji, dan ID Branch harus berupa angka valid!");
         } catch (IllegalArgumentException e) {
             showErrorAlert("Format Salah", "Format Tanggal Lahir harus YYYY-MM-DD!");
         }

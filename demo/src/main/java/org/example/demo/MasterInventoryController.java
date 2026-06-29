@@ -89,16 +89,23 @@ public class MasterInventoryController {
     @FXML
     public void onAddBtnClick() {
         try {
-            if (txtidInventory.getText().trim().isEmpty() || txtStok.getText().trim().isEmpty() ||
-                    txtidMenu.getText().trim().isEmpty() || txtidBranch.getText().trim().isEmpty()) {
+            //Ambil data string murni dari komponen UI di awal
+            String idRaw = txtidInventory.getText().trim();
+            String stockRaw = txtStok.getText().trim();
+            String idMenuRaw = txtidMenu.getText().trim();
+            String idBranchRaw = txtidBranch.getText().trim();
+
+            //VALIDASI UTAMA: Cek kekosongan string murni terlebih dahulu
+            if (idRaw.isEmpty() || stockRaw.isEmpty() || idMenuRaw.isEmpty() || idBranchRaw.isEmpty()) {
                 showWarningAlert("Input Kosong", "Semua kolom data wajib diisi!");
                 return;
             }
 
-            int id = Integer.parseInt(txtidInventory.getText().trim());
-            int stock = Integer.parseInt(txtStok.getText().trim());
-            int idMenu = Integer.parseInt(txtidMenu.getText().trim());
-            int idBranch = Integer.parseInt(txtidBranch.getText().trim());
+            //PARSING DATA: Aman dieksekusi karena string ID dijamin sudah ada isinya
+            int id = Integer.parseInt(idRaw);
+            int stock = Integer.parseInt(stockRaw);
+            int idMenu = Integer.parseInt(idMenuRaw);
+            int idBranch = Integer.parseInt(idBranchRaw);
 
             // CONSTRAINT inventory_stok_inventory_ck nilai stok gudang tidak boleh bernilai kurang dari nol (>= 0)
             if (stock < 0) {
