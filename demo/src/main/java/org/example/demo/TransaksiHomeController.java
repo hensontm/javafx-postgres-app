@@ -41,7 +41,7 @@ public class TransaksiHomeController {
         boolean isCurrentlyMaximized = stage.isMaximized();
 
         root = FXMLLoader.load(getClass().getResource("transaksi-view.fxml"));
-        scene = new Scene(root);
+        scene = new Scene(root,1280,720);
 
         stage.setScene(scene);
         stage.setMaximized(isCurrentlyMaximized);
@@ -55,7 +55,7 @@ public class TransaksiHomeController {
         boolean isCurrentlyMaximized = stage.isMaximized();
 
         root = FXMLLoader.load(getClass().getResource("kelola-transaksi-view.fxml"));
-        scene = new Scene(root);
+        scene = new Scene(root,1280,720);
 
         stage.setScene(scene);
         stage.setMaximized(isCurrentlyMaximized);
