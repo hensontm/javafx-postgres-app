@@ -158,20 +158,50 @@ public class KelolaTransaksiController {
         String statusBaru = comboStatusUpdate.getValue();
         if (statusBaru == null) return;
 
-        String query = "UPDATE public.customer_order SET status_order = ? WHERE id_order = ?";
+        // Ambil string murni status saat ini dari tabel UI
+        String statusLama = selected.getStatusOrder();
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        // VALIDASI UTAMA: Jika status saat ini sudah "Selesai", kunci total dan blokir semua upaya update
+        if (statusLama.equalsIgnoreCase("Selesai")) {
+            showWarningAlert("Aksi Ditolak", "Transaksi yang sudah berstatus 'Selesai' tidak dapat diubah kembali!");
+            return;
+        }
 
-            stmt.setString(1, statusBaru);
-            stmt.setInt(2, selected.getIdOrder());
-            stmt.executeUpdate();
+        // Eksekusi pembaruan status dan sinkronisasi stok logistik (Transaction Safe)
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            conn.setAutoCommit(false);
 
+            //UPDATE STATUS: Memperbarui status order utama di database
+            String queryUpdateStatus = "UPDATE public.customer_order SET status_order = ? WHERE id_order = ?";
+            try (PreparedStatement stmtStatus = conn.prepareStatement(queryUpdateStatus)) {
+                stmtStatus.setString(1, statusBaru);
+                stmtStatus.setInt(2, selected.getIdOrder());
+                stmtStatus.executeUpdate();
+            }
+
+            //KONDISIONAL STOK: Jika status berubah menjadi 'Selesai', potong kuantitas inventory cabang
+            if (statusBaru.equalsIgnoreCase("Selesai")) {
+                // SUBQUERY & JOIN: Mengurangi stok bahan menu di tabel inventory berdasarkan id_menu dan id_branch yang aktif di nota
+                String queryPotongStok = "UPDATE public.inventory i " +
+                        "SET stok_inventory = i.stok_inventory - od.jumlah_detail " +
+                        "FROM public.order_detail od " +
+                        "JOIN public.customer_order co ON od.id_order = co.id_order " +
+                        "WHERE i.id_menu = od.id_menu " +
+                        "AND i.id_branch = co.id_branch " +
+                        "AND co.id_order = ?";
+
+                try (PreparedStatement stmtStok = conn.prepareStatement(queryPotongStok)) {
+                    stmtStok.setInt(1, selected.getIdOrder());
+                    stmtStok.executeUpdate();
+                }
+            }
+
+            conn.commit();
             showInformationAlert("Sukses", "Status transaksi berhasil diperbarui menjadi: " + statusBaru);
             loadMasterOrder(txtCari.getText().trim());
 
         } catch (SQLException e) {
-            // CONSTRAINT Menjamin isi pembaruan status patuh pada standarisasi isi domain CHECK constraint status_order
+            // CONSTRAINT Menjamin isi pembaruan status patuh pada aturan CHECK constraint database dan foreign key
             showErrorAlert("Database Error", "Gagal mengubah status akibat pelanggaran aturan: " + e.getMessage());
         }
     }
