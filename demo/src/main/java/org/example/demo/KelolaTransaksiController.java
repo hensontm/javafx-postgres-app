@@ -225,25 +225,6 @@ public class KelolaTransaksiController {
         loadMasterOrder(txtCari.getText().trim());
     }
 
-    // Tampilkan rangkuman statistik performa kasir via kolaborasi fungsi agregasi tingkat lanjut
-    @FXML
-    public void onShowStatisticClick() {
-        // AGGREGATION Menghitung nilai rerata nominal belanjaan nota menggunakan fungsi statistik AVG()
-        // SUBQUERRY klausa nested subquery menyeleksi kuantitas transaksi sukses yang nominal belanjanya melampaui omset rata-rata
-        String query = "SELECT COUNT(id_order) FROM public.customer_order WHERE total_bayar > (SELECT AVG(total_bayar) FROM public.customer_order)";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
-
-            if (rs.next()) {
-                int jumlahTransaksiHebat = rs.getInt(1);
-                showInformationAlert("Rangkuman Agregasi", "Jumlah transaksi bernilai besar (di atas rata-rata): " + jumlahTransaksiHebat + " nota.");
-            }
-        } catch (SQLException e) {
-            showErrorAlert("Database Error", "Gagal memproses perhitungan agregasi statistika: " + e.getMessage());
-        }
-    }
 
     //RESET
     @FXML

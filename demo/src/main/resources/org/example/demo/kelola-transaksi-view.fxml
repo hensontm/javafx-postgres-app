@@ -79,7 +79,6 @@
                 </Label>
                 <ComboBox fx:id="comboStatusUpdate" prefWidth="150.0" promptText="Pilih Status Baru" />
                 <Button onAction="#onUpdateStatusBtnClick" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;" text="Update Status" />
-                <Button onAction="#onShowStatisticClick" style="-fx-background-color: #9C27B0; -fx-text-fill: white;" text="📊 Tampilkan Statistik Gaji/Nota" />
                 <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
                     <Button onAction="#onDeleteTransaksiBtnClick" style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-weight: bold;" text="🗑️ Hapus Transaksi" />
                 </HBox>
