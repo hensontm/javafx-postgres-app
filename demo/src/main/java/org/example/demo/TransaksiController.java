@@ -207,11 +207,18 @@ public class TransaksiController {
     //Commit ke PosgreSQL
     @FXML
     public void onAddTransactionFinalClick() {
-        if (listKeranjangUtama.isEmpty() || txtNamaCust.getText().trim().isEmpty() || txtEmailCust.getText().trim().isEmpty() ||
-                comboBranch.getValue() == null || comboEmployee.getValue() == null || comboPayment.getValue() == null) {
-            showWarningAlert("Gagal Simpan", "Keranjang kosong atau identitas nota & email belum dilengkapi!");
+        if (listKeranjangUtama.isEmpty() ||
+                txtNamaCust.getText().trim().isEmpty() ||
+                txtTelpCust.getText().trim().isEmpty() || // <-- Pengecekan nomor telepon ditambahkan di sini
+                txtEmailCust.getText().trim().isEmpty() ||
+                comboBranch.getValue() == null ||
+                comboEmployee.getValue() == null ||
+                comboPayment.getValue() == null) {
+
+            showWarningAlert("Gagal Simpan", "Keranjang kosong atau kelengkapan data pelanggan (Nama, Telp, Email) belum diisi!");
             return;
         }
+
 
         Connection conn = null;
         try {
