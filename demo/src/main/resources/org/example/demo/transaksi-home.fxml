@@ -11,7 +11,9 @@
 
             <Button fx:id="btn_inputTransaksi" onAction="#goInputTransaksi" prefHeight="45" prefWidth="250" text="Input Transaksi" />
 
-            <Button fx:id="btn_lihatTransaksi" onAction="#goLihatTransaksi" prefHeight="45" prefWidth="250" text="Kelola Transaksi" />
+            <Button fx:id="btn_lihatTransaksi" onAction="#goKelolaTransaksi" prefHeight="45" prefWidth="250" text="Kelola Transaksi" />
+
+            <Button fx:id="btn_kelolaInventory" onAction="#onInventoryBtnClick" prefHeight="45" prefWidth="250" text="Kelola Inventory" />
 
         </VBox>
     </center>

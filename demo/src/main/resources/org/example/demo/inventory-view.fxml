@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="720" prefWidth="1280" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.MasterInventoryController">
+<BorderPane prefHeight="720" prefWidth="1280" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.InventoryController">
 
     <left>
         <VBox prefWidth="320" spacing="15" style="-fx-background-color:#F4F4F4;">

@@ -6,61 +6,24 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefWidth="1280.0" prefHeight="720.0"
-            xmlns="http://javafx.com/javafx/25"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.example.demo.MasterController">
+<BorderPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.MasterController">
 
    <center>
       <VBox alignment="CENTER" spacing="15">
 
-         <Button fx:id="btn_employee"
-                 text="Employee"
-                 prefWidth="250"
-                 prefHeight="45"
-                 onAction="#goEmployee"/>
+         <Button fx:id="btn_employee" onAction="#goEmployee" prefHeight="45" prefWidth="250" text="Employee" />
 
-         <Button fx:id="btn_branch"
-                 text="Branch"
-                 prefWidth="250"
-                 prefHeight="45"
-                 onAction="#goBranch"/>
+         <Button fx:id="btn_branch" onAction="#goBranch" prefHeight="45" prefWidth="250" text="Branch" />
 
-         <Button fx:id="btn_inventory"
-                 text="Inventory"
-                 prefWidth="250"
-                 prefHeight="45"
-                 onAction="#goInventory"/>
+         <Button fx:id="btn_customer" onAction="#goCustomer" prefHeight="45" prefWidth="250" text="Customer" />
 
-         <Button fx:id="btn_customer"
-                 text="Customer"
-                 prefWidth="250"
-                 prefHeight="45"
-                 onAction="#goCustomer"/>
+         <Button fx:id="btn_payment" onAction="#goPayment" prefHeight="45" prefWidth="250" text="Payment" />
 
-         <Button fx:id="btn_payment"
-                 text="Payment"
-                 prefWidth="250"
-                 prefHeight="45"
-                 onAction="#goPayment"/>
+         <Button fx:id="btn_customization" onAction="#goCustomization" prefHeight="45" prefWidth="250" text="Customization" />
 
-         <Button fx:id="btn_customization"
-                 text="Customization"
-                 prefWidth="250"
-                 prefHeight="45"
-                 onAction="#goCustomization"/>
+         <Button fx:id="btn_menu" onAction="#goMenu" prefHeight="45" prefWidth="250" text="Menu" />
 
-         <Button fx:id="btn_menu"
-                 text="Menu"
-                 prefWidth="250"
-                 prefHeight="45"
-                 onAction="#goMenu"/>
-
-         <Button fx:id="btn_category"
-                 text="Category"
-                 prefWidth="250"
-                 prefHeight="45"
-                 onAction="#goCategory"/>
+         <Button fx:id="btn_category" onAction="#goCategory" prefHeight="45" prefWidth="250" text="Category" />
 
       </VBox>
    </center>
@@ -68,14 +31,10 @@
    <bottom>
       <HBox alignment="CENTER_LEFT">
          <padding>
-            <Insets left="25" bottom="25"/>
+            <Insets bottom="25" left="25" />
          </padding>
 
-         <Button fx:id="btn_back"
-                 text="Back"
-                 prefWidth="90"
-                 prefHeight="35"
-                 onAction="#goBack"/>
+         <Button fx:id="btn_back" onAction="#goBack" prefHeight="35" prefWidth="90" text="Back" />
 
       </HBox>
    </bottom>

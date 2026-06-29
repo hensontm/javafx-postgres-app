@@ -15,7 +15,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.sql.*;
 
-public class MasterInventoryController {
+public class InventoryController {
 
     //ID
     @FXML private TextField txtidInventory;
@@ -286,7 +286,7 @@ public class MasterInventoryController {
         stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         boolean isCurrentlyMaximized = stage.isMaximized();
 
-        root = FXMLLoader.load(getClass().getResource("master-view.fxml"));
+        root = FXMLLoader.load(getClass().getResource("transaksi-home.fxml"));
         scene = new Scene(root);
 
         stage.setScene(scene);

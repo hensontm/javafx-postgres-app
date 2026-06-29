@@ -13,15 +13,17 @@ import java.io.IOException;
 
 public class TransaksiHomeController {
     //Id
-    @FXML Button btn_inputTransaksi;
-    @FXML Button btn_lihatTransaksi;
-    @FXML Button btn_back;
+    @FXML private Button btn_inputTransaksi;
+    @FXML private Button btn_lihatTransaksi;
+    @FXML private Button btn_kelolaInventory;
+    @FXML private Button btn_back;
 
     private Stage stage;
     private Scene scene;
     private Parent root;
 
     //BACK
+    @FXML
     public void goBack(ActionEvent event) throws IOException {
         stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         boolean isCurrentlyMaximized = stage.isMaximized();
@@ -41,21 +43,35 @@ public class TransaksiHomeController {
         boolean isCurrentlyMaximized = stage.isMaximized();
 
         root = FXMLLoader.load(getClass().getResource("transaksi-view.fxml"));
-        scene = new Scene(root,1280,720);
+        scene = new Scene(root, 1280, 720);
 
         stage.setScene(scene);
         stage.setMaximized(isCurrentlyMaximized);
         stage.show();
     }
 
-    //Lihat Transaksi
+    //Kelola Transaksi (Sudah sukses di-refactor namanya agar sinkron)
     @FXML
-    public void goLihatTransaksi(ActionEvent e) throws IOException {
+    public void goKelolaTransaksi(ActionEvent e) throws IOException {
         stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
         boolean isCurrentlyMaximized = stage.isMaximized();
 
         root = FXMLLoader.load(getClass().getResource("kelola-transaksi-view.fxml"));
-        scene = new Scene(root,1280,720);
+        scene = new Scene(root, 1280, 720);
+
+        stage.setScene(scene);
+        stage.setMaximized(isCurrentlyMaximized);
+        stage.show();
+    }
+
+    //Kelola Inventory
+    @FXML
+    public void onInventoryBtnClick(ActionEvent e) throws IOException {
+        stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
+        boolean isCurrentlyMaximized = stage.isMaximized();
+
+        root = FXMLLoader.load(getClass().getResource("inventory-view.fxml"));
+        scene = new Scene(root, 1280, 720);
 
         stage.setScene(scene);
         stage.setMaximized(isCurrentlyMaximized);
