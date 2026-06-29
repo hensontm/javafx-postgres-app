@@ -93,6 +93,9 @@
                             <TableColumn fx:id="colCustSummaryCart" prefWidth="274.0" text="Rincian Topping" />
                             <TableColumn fx:id="colTotalCart" prefWidth="150.5" text="Subtotal (Rp)" />
                         </columns>
+                  <columnResizePolicy>
+                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                  </columnResizePolicy>
                     </TableView>
                 </VBox>
 
