@@ -62,9 +62,12 @@
                         <TableColumn fx:id="colWaktu" prefWidth="121.0" text="Waktu" />
                         <TableColumn fx:id="colCustomer" prefWidth="187.5" text="Nama Customer" />
                         <TableColumn fx:id="colBranch" prefWidth="183.5" text="Cabang Restoran" />
-                        <TableColumn fx:id="colTotalBayar" prefWidth="152.5" text="Total Bayar (Rp)" />
-                        <TableColumn fx:id="colStatus" prefWidth="214.5" text="Status Order" />
+                        <TableColumn fx:id="colTotalBayar" prefWidth="169.5" text="Total Bayar (Rp)" />
+                        <TableColumn fx:id="colStatus" prefWidth="197.5" text="Status Order" />
                     </columns>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
                 </TableView>
             </VBox>
 
