@@ -50,7 +50,7 @@ public class TransaksiHomeController {
         stage.show();
     }
 
-    //Kelola Transaksi (Sudah sukses di-refactor namanya agar sinkron)
+    //Kelola Transaksi
     @FXML
     public void goKelolaTransaksi(ActionEvent e) throws IOException {
         stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
